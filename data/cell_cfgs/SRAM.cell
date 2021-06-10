@@ -1,0 +1,4 @@
+-MemCellType: SRAM
+-CellArea (F^2): 146
+-CellAspectRatio: 1.460000
+-AccessType: CMOS

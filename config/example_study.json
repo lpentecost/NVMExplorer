@@ -1,0 +1,10 @@
+{"experiment": {
+    "exp_name":"example",  
+    "cell_type":["RRAM", "PCM", "SRAM"],
+    "opt_target":["ReadEDP"],
+    "capacity":[2],
+    "traffic":["generic", "dnn"],
+    "nvsim_path":"./nvmexplorer_src/nvsim_src/nvsim",
+    "output_path":"./output"
+}
+}  

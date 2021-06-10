@@ -1,0 +1,3 @@
+[submodule "nvmexplorer_src/nvsim_src"]
+	path = nvmexplorer_src/nvsim_src
+	url = https://github.com/lpentecost/nvsim-merged

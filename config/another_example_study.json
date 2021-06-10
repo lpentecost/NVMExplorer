@@ -1,0 +1,6 @@
+{"experiment": {
+    "exp_name":"example",  
+    "cell_type":["STT", "FeFET"],
+    "bpc":[1, 2],
+}
+}  

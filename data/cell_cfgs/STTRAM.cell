@@ -1,0 +1,18 @@
+-MemCellType: MRAM
+-CellArea (F^2): 54
+-CellAspectRatio: 1.460000
+-AccessType: CMOS
+-AccessCMOSWidth (F): 6.000000
+-ResistanceOn (ohm): 3000
+-ResistanceOff (ohm): 6000
+-ReadMode: current
+-ReadVoltage (V): 0.250000
+-ReadPower (uW): 30.000000
+-ResetMode: current
+-ResetCurrent (uA): 80
+-ResetPulse (ns): 10
+-ResetEnergy (pJ): 1
+-SetMode: current
+-SetCurrent (uA): 80
+-SetPulse (ns): 10
+-SetEnergy (pJ): 1

@@ -1,0 +1,16 @@
+-MemCellType: PCM
+-CellArea (F^2): 9
+-CellAspectRatio: 1.460000
+-AccessType: CMOS
+-AccessCMOSWidth (F): 6.000000
+-ResistanceOn (ohm): 1000
+-ResistanceOff (ohm): 1000000
+-ReadMode: voltage
+-ReadCurrent (uA): 40.000000
+-ReadEnergy (pJ): 2.000000
+-ResetMode: current
+-ResetCurrent (uA): 300
+-ResetPulse (ns): 40
+-SetMode: current
+-SetCurrent (uA): 150
+-SetPulse (ns): 150
