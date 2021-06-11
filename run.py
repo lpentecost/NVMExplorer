@@ -278,6 +278,8 @@ if __name__ == '__main__':
                       os.makedirs(log_dir)
                   if not os.path.exists(output_dir): 
                       os.makedirs(output_dir)
+                  if not os.path.exists("{}/results".format(output_path)): 
+                      os.makedirs("{}/results".format(output_path))
                   if not os.path.exists("data/mem_cfgs"): 
                       os.makedirs("data/mem_cfgs")
                   best_case_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC-optimized_best_case.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell)
