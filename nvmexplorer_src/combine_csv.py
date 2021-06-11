@@ -12,7 +12,7 @@ def combine_csv(cell_type, mlc, bg=0):
     :type mlc: int
     """
     if (bg == 0):
-      output_file_name = "output/results/{}_{}BPC-optimization_study_combined.csv".format(cell_type, mlc)
+      output_file_name = "output/results/{}_{}BPC-combined.csv".format(cell_type, mlc)
     else:
       output_file_name = "output/results/FeFET_BG_study.csv"
     

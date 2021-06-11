@@ -313,7 +313,7 @@ if __name__ == '__main__':
                   nvsim_best_case_output, nvsim_worst_case_output = run_nvsim_tentpoles(worst_output_path, best_output_path, log_dir, best_case_stdout_log, best_case_stderr_log, worst_case_stdout_log, worst_case_stderr_log, nvsim_path, best_case_cfg_path, worst_case_cfg_path, nvsim_best_case_input_cfg, nvsim_worst_case_input_cfg, output_dir)
                       
                   # Report results, add cell config params, mem config params, and whatever we are sweeping to the header
-                  results_csv = "{}/results/{}_{}MB_{}_{}BPC-optimization_study.csv".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell)
+                  results_csv = "{}/results/{}_{}MB_{}_{}BPC-{}.csv".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, exp_name)
                       
                   if os.path.exists(results_csv):
                       os.remove(results_csv)
