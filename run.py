@@ -274,6 +274,12 @@ if __name__ == '__main__':
                   ## Define the paths
                   log_dir = "{}/logs".format(output_path) # This is where we'll store stdout and stderr for each NVSim run for debugging and/or post-processing purposes
                   output_dir = "{}/nvsim_output".format(output_path) # This is where we'll store the pickled results. In case we are doing a run that doesn't require re-running NVSim
+                  if not os.path.exists(log_dir): 
+                      os.makedirs(log_dir)
+                  if not os.path.exists(output_dir): 
+                      os.makedirs(output_dir)
+                  if not os.path.exists("data/mem_cfgs"): 
+                      os.makedirs("data/mem_cfgs")
                   best_case_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC-optimized_best_case.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell)
                   worst_case_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC-optimized_worst_case.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell)
                   best_case_stdout_log = "{}/logs/{}_{}MB_{}_{}BPC-optimized_best_case_output".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell)
