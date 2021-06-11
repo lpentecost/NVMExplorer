@@ -203,7 +203,7 @@ if __name__ == '__main__':
   # Load config file
   with open(sys.argv[1]) as f:
       config = json.load(f)
-  
+ 
   # Override default values of local variables if needed
   if "exp_name" in config["experiment"]:
       if config["experiment"]["exp_name"]:
@@ -251,6 +251,7 @@ if __name__ == '__main__':
       if config["experiment"]["output_path"]:
           output_path = config["experiment"]["output_path"]
    
+  print("Successfully Loaded Config File")
   
   # The main loop of NVMExplorer
   for _cell_type in cell_type:
@@ -322,7 +323,9 @@ if __name__ == '__main__':
                       
                   worst_case_result.evaluate()
                   best_case_result.evaluate()
-                      
+ 
+                  print("Retrieved Array-Level Results; Running Analytical Model")
+                     
                   # Run application-level sweeps and save results
                   #FIXME also add conditional for customized traffic inputs
                   if len(traffic) > 0:
@@ -350,3 +353,4 @@ if __name__ == '__main__':
                           generic_traffic_with_write_buff(access_pattern, nvsim_best_case_input_cfg, nvsim_best_case_output, nvsim_worst_case_input_cfg, nvsim_worst_case_output, results_csv, best_case_cell_path, best_case_cfg_path, worst_case_cell_path, worst_case_cfg_path)
       
       combine_csv(_cell_type, _bits_per_cell)
+      print("Reported Results; Evaluation Complete")
