@@ -1,8 +1,8 @@
 {"experiment": {
     "exp_name":"dnn_example",  
-    "cell_type":["RRAM", "SRAM"],
-    "opt_target":["ReadEDP", "ReadLatency", "ReadDynamicEnergy"],
-    "capacity":[2, 4],
+    "cell_type":["PCM", "SRAM"],
+    "opt_target":["ReadEDP", "ReadLatency"],
+    "capacity":[4],
     "traffic":["dnn"],
     "nvsim_path":"./nvmexplorer_src/nvsim_src/nvsim",
     "output_path":"./output"
