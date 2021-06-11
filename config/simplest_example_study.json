@@ -1,8 +1,8 @@
 {"experiment": {
     "exp_name":"example",  
-    "cell_type":["RRAM"],
+    "cell_type":["STT"],
     "opt_target":["ReadEDP"],
-    "capacity":[2],
+    "capacity":[8],
     "traffic":["generic"],
     "nvsim_path":"./nvmexplorer_src/nvsim_src/nvsim",
     "output_path":"./output"
