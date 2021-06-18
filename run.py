@@ -46,140 +46,58 @@ def load_spreadsheet_data(cell_type, output_path):
 
   return temp_df
 
-
-def run_nvsim_tentpoles(worst_output_path, best_output_path, log_dir, best_case_stdout_log, best_case_stderr_log, worst_case_stdout_log, worst_case_stderr_log, nvsim_path, best_case_cfg_path, worst_case_cfg_path, nvsim_best_case_input_cfg, nvsim_worst_case_input_cfg, output_dir):
-  """ Returns NVSim output from simulating user-specified, tentpole-based memory arrays
+def run_nvsim(output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, cfg_paths, nvsim_input_cfgs, output_dir):
+  """ Returns NVSim output from simulating user-specified cell definitions
   in parallel and pickles the output. NVSim is only run if pickles do not already
   exist
 
-  :param worst_output_path: path for pickled output of worst-case NVSim output
-  :type worst_output_path: String
-  :param best_output_path: path for pickled output of best-case NVSim output
-  :type best_output_path: String
+  :param output_paths: paths for pickled outputs
+  :type output_paths: Array of Strings
   :param log_dir: directory containing log files from NVSim runs
   :type log_dir: String
-  :param best_case_stdout_log: path to stdout from best-case NVSim run
-  :type best_case_stdout_log: String
-  :param best_case_stderr_log: path to stderr from best-case NVSim run
-  :type best_case_stderr_log: String
-  :param worst_case_stdout_log: path to stdout from worst-case NVSim run
-  :type worst_case_stdout_log: String
-  :param worst_case_stderr_log: path to stderr from worst-case NVSim run
-  :type worst_case_stderr_log: String
+  :param stdout_logs: paths to stdout from NVSim runs
+  :type stdout_logs: Array of Strings
+  :param stderr_logs: paths to stderr from NVSim runs
+  :type stderr_logs: Array of Strings
   :param nvsim_path: path to NVSim version
   :type nvsim_path: String
-  :param best_case_cfg_path: path to best-case cfg file for NVSim run
-  :type best_case_cfg_path: String
-  :param worst_case_cfg_path: path to worst-case cfg file for NVSim run
-  :type worst_case_cfg_path: String
-  :param nvsim_best_case_input_cfg: :class:`NVSimIntputConfig` object that was 
-  used to create the best-case NVSim output 
-  :type nvsim_best_case_input_cfg: :class:`NVSimIntputConfig`
-  :param nvsim_worst_case_input_cfg: :class:`NVSimIntputConfig` object that was 
-  used to create the worst-case NVSim output 
-  :type nvsim_worst_case_input_cfg: :class:`NVSimIntputConfig`
+  :param cfg_paths: paths to cfg files for NVSim run
+  :type cfg_paths: Array of Strings
+  :param nvsim_input_cfgs: Array of :class:`NVSimIntputConfig` object that were 
+  used to create the NVSim outputs
+  :type nvsim_input_cfgs: Array of :class:`NVSimIntputConfig`
   :param output_dir: path to output dir for pickled NVSim output
   :type output_dir: String
-  :return: tuple of Strings pointing to NVSim output files for best- and worst-
-  case runs
-  :rtype: tuple of Strings
+  :return: Array of Strings pointing to NVSim output files
+  :rtype: Array of Strings
   """
-  if not os.path.exists(worst_output_path) and not os.path.exists(best_output_path):
-    if not os.path.exists(log_dir): 
-        os.makedirs(log_dir)
-
-    # NVSim execution in parallel 
+  for i in range(len(output_paths)):
     nvsim_processes = []
 
-    with open(best_case_stdout_log, "w") as f_best_case:
-      with open(best_case_stderr_log, "w") as f_best_case_error:
-        p1 = subprocess.Popen([nvsim_path, best_case_cfg_path],  stdout=f_best_case, stderr=f_best_case_error)
+    if not os.path.exists(output_paths[i]): 
+      with open(stdout_logs[i], "w") as f_out:
+        with open(stderr_logs[i], "w") as f_error:
+          p1 = subprocess.Popen([nvsim_path, cfg_paths[i]],  stdout=f_out, stderr=f_error)
 
-    with open(worst_case_stdout_log, "w") as f_worst_case:
-      with open(worst_case_stderr_log, "w") as f_worst_case_error:
-        p2 = subprocess.Popen([nvsim_path, worst_case_cfg_path],  stdout=f_worst_case, stderr=f_worst_case_error)
+      nvsim_processes.append(p1)
 
-    nvsim_processes.append(p1)
-    nvsim_processes.append(p2)
-
-    for proc in nvsim_processes:
-        proc.wait()
-
-    nvsim_best_case_output = nvmexplorer_src.input_defs.nvsim_interface.parse_nvsim_output(best_case_stdout_log, input_cfg=nvsim_best_case_input_cfg)
-    nvsim_worst_case_output = nvmexplorer_src.input_defs.nvsim_interface.parse_nvsim_output(worst_case_stdout_log, input_cfg=nvsim_worst_case_input_cfg)
-
-    if not os.path.exists(output_dir): 
-        os.makedirs(output_dir)
-
-    pickle.dump(nvsim_best_case_output,open(best_output_path, 'wb'))
-    pickle.dump(nvsim_worst_case_output,open(worst_output_path, 'wb'))
+  for proc in nvsim_processes:
+    proc.wait()
   
-  # Output already exists - load the pickle(s)
-  else:
-    nvsim_best_case_output = pickle.load(open(best_output_path, 'rb')) 
-    nvsim_worst_case_output = pickle.load(open(worst_output_path, 'rb')) 
+  nvsim_outputs = []
+  for i in range(len(output_paths)):
+    if not os.path.exists(output_paths[i]): 
+      nvsim_output = nvmexplorer_src.input_defs.nvsim_interface.parse_nvsim_output(stdout_logs[i], input_cfg=nvsim_input_cfgs[i])
+      if not os.path.exists(output_dir): 
+        os.makedirs(output_dir)
+      nvsim_outputs.append(nvsim_output)
+      pickle.dump(nvsim_output,open(output_paths[i], 'wb'))
+    # Output already exists - load the pickle(s)
+    else:
+      nvsim_output = pickle.load(open(output_paths[i], 'rb')) 
+      nvsim_outputs.append(nvsim_output)
 
-  return nvsim_best_case_output, nvsim_worst_case_output
-
-def run_nvsim(output_path, log_dir, stdout_log, stderr_log, nvsim_path, cfg_path, nvsim_input_cfg, output_dir):
-  """ Returns NVSim output from simulating user-specified, tentpole-based memory arrays
-  in parallel and pickles the output. NVSim is only run if pickles do not already
-  exist
-
-  :param worst_output_path: path for pickled output of worst-case NVSim output
-  :type worst_output_path: String
-  :param best_output_path: path for pickled output of best-case NVSim output
-  :type best_output_path: String
-  :param log_dir: directory containing log files from NVSim runs
-  :type log_dir: String
-  :param best_case_stdout_log: path to stdout from best-case NVSim run
-  :type best_case_stdout_log: String
-  :param best_case_stderr_log: path to stderr from best-case NVSim run
-  :type best_case_stderr_log: String
-  :param worst_case_stdout_log: path to stdout from worst-case NVSim run
-  :type worst_case_stdout_log: String
-  :param worst_case_stderr_log: path to stderr from worst-case NVSim run
-  :type worst_case_stderr_log: String
-  :param nvsim_path: path to NVSim version
-  :type nvsim_path: String
-  :param best_case_cfg_path: path to best-case cfg file for NVSim run
-  :type best_case_cfg_path: String
-  :param worst_case_cfg_path: path to worst-case cfg file for NVSim run
-  :type worst_case_cfg_path: String
-  :param nvsim_best_case_input_cfg: :class:`NVSimIntputConfig` object that was 
-  used to create the best-case NVSim output 
-  :type nvsim_best_case_input_cfg: :class:`NVSimIntputConfig`
-  :param nvsim_worst_case_input_cfg: :class:`NVSimIntputConfig` object that was 
-  used to create the worst-case NVSim output 
-  :type nvsim_worst_case_input_cfg: :class:`NVSimIntputConfig`
-  :param output_dir: path to output dir for pickled NVSim output
-  :type output_dir: String
-  :return: tuple of Strings pointing to NVSim output files for best- and worst-
-  case runs
-  :rtype: tuple of Strings
-  """
-  if not os.path.exists(output_path):
-    nvsim_processes = []
-
-    with open(stdout_log, "w") as f_out:
-      with open(stderr_log, "w") as f_error:
-        p1 = subprocess.Popen([nvsim_path, cfg_path],  stdout=f_out, stderr=f_error)
-
-    nvsim_processes.append(p1)
-
-    for proc in nvsim_processes:
-      proc.wait()
-    
-    nvsim_output = nvmexplorer_src.input_defs.nvsim_interface.parse_nvsim_output(stdout_log, input_cfg=nvsim_input_cfg)
-    if not os.path.exists(output_dir): 
-      os.makedirs(output_dir)
-
-    pickle.dump(nvsim_output,open(output_path, 'wb'))
-  # Output already exists - load the pickle(s)
-  else:
-    nvsim_output = pickle.load(open(output_path, 'rb')) 
-
-  return nvsim_output
+  return nvsim_outputs
 
 ## Initialize objects based on config file and run eval
 if __name__ == '__main__':
@@ -199,6 +117,7 @@ if __name__ == '__main__':
   traffic = []
   nvsim_path = "nvmexplorer_src/nvsim/nvsim"
   output_path = "output"
+  cell_tentpoles = True #by default, run a "tentpole" style study
 
   # Load config file
   with open(sys.argv[1]) as f:
@@ -250,6 +169,8 @@ if __name__ == '__main__':
   if "output_path" in config["experiment"]:
       if config["experiment"]["output_path"]:
           output_path = config["experiment"]["output_path"]
+  if "custom_cells" in config["experiment"]:
+      cell_tentpoles = False
    
   print("Successfully Loaded Config File")
   
@@ -267,11 +188,7 @@ if __name__ == '__main__':
                   
                   # Loads data from NVM database
                   data_df = load_spreadsheet_data(_cell_type, output_path)
-
-                  # TODO: conditional for tentpole study or default values study
-                  # Creates the tentpoles per technology
-                  best_case_cell_path, worst_case_cell_path, best_case_cell_cfg, worst_case_cell_cfg = form_tentpoles(data_df, _cell_type, _bits_per_cell)
-
+                      
                   ## Define the paths
                   log_dir = "{}/logs".format(output_path) # This is where we'll store stdout and stderr for each NVSim run for debugging and/or post-processing purposes
                   output_dir = "{}/nvsim_output".format(output_path) # This is where we'll store the pickled results. In case we are doing a run that doesn't require re-running NVSim
@@ -283,74 +200,115 @@ if __name__ == '__main__':
                       os.makedirs("{}/results".format(output_path))
                   if not os.path.exists("data/mem_cfgs"): 
                       os.makedirs("data/mem_cfgs")
-                  best_case_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC-optimized_best_case.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell)
-                  worst_case_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC-optimized_worst_case.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell)
-                  best_case_stdout_log = "{}/logs/{}_{}MB_{}_{}BPC-optimized_best_case_output".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell)
-                  best_case_stderr_log = "{}/logs/{}_{}MB_{}_{}BPC-optimized_best_case_error".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell)
-                  worst_case_stdout_log = "{}/logs/{}_{}MB_{}_{}BPC-optimized_worst_case_output".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell)
-                  worst_case_stderr_log = "{}/logs/{}_{}MB_{}_{}BPC-optimized_worst_case_error".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell)
 
-                  ## Generate corresponding mem cfgs
-                  nvsim_best_case_input_cfg = nvmexplorer_src.input_defs.nvsim_interface.NVSimInputConfig(mem_cfg_file_path = best_case_cfg_path, process_node = process_node,
-                        opt_target = _opt_target,
-                        word_width = word_width,
-                        capacity = _capacity,
-                        cell_type = best_case_cell_cfg)
-
-                  nvsim_worst_case_input_cfg = nvmexplorer_src.input_defs.nvsim_interface.NVSimInputConfig(mem_cfg_file_path = worst_case_cfg_path, process_node = process_node,
-                        opt_target = _opt_target,
-                        word_width = word_width,
-                        capacity = _capacity,
-                        cell_type = worst_case_cell_cfg)
-
-                  nvsim_worst_case_input_cfg.generate_mem_cfg()
-                  nvsim_best_case_input_cfg.generate_mem_cfg()
-
-                  worst_output_path = "{}/nvsim_output/{}_{}MB_{}_{}BPC_{}b-optimized_worst_case_nvsim_output.pkl".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, word_width)
-                  best_output_path = "{}/nvsim_output/{}_{}MB_{}_{}BPC_{}b-optimized_best_case_nvsim_output.pkl".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, word_width)
-                      
-                  # Runs modified nvsim on tentpoles
-                  nvsim_best_case_output, nvsim_worst_case_output = run_nvsim_tentpoles(worst_output_path, best_output_path, log_dir, best_case_stdout_log, best_case_stderr_log, worst_case_stdout_log, worst_case_stderr_log, nvsim_path, best_case_cfg_path, worst_case_cfg_path, nvsim_best_case_input_cfg, nvsim_worst_case_input_cfg, output_dir)
-                      
-                  # Report results, add cell config params, mem config params, and whatever we are sweeping to the header
-                  results_csv = "{}/results/{}_{}MB_{}_{}BPC-{}.csv".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, exp_name)
-                      
+                  results_csv = "{}/results/{}_{}MB_{}_{}BPC-{}.csv".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, exp_name)    
                   if os.path.exists(results_csv):
                       os.remove(results_csv)
 
-                  worst_case_result = ExperimentResult(access_pattern, nvsim_worst_case_input_cfg, nvsim_worst_case_output)
-                  best_case_result = ExperimentResult(access_pattern, nvsim_best_case_input_cfg, nvsim_best_case_output)
-                      
-                  worst_case_result.evaluate()
-                  best_case_result.evaluate()
+
+                  # TODO: conditional for tentpole study or default values study
+                  if (cell_tentpoles == True): #set up default, tentpole-style study per cell type
+                      # Creates the tentpoles per technology
+                      best_case_cell_path, worst_case_cell_path, best_case_cell_cfg, worst_case_cell_cfg = form_tentpoles(data_df, _cell_type, _bits_per_cell)
+
+                      best_case_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC-best_case.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell)
+                      worst_case_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC-worst_case.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell)
+                      best_case_stdout_log = "{}/logs/{}_{}MB_{}_{}BPC-best_case_output".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell)
+                      best_case_stderr_log = "{}/logs/{}_{}MB_{}_{}BPC-best_case_error".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell)
+                      worst_case_stdout_log = "{}/logs/{}_{}MB_{}_{}BPC-worst_case_output".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell)
+                      worst_case_stderr_log = "{}/logs/{}_{}MB_{}_{}BPC-worst_case_error".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell)
+
+                      ## Generate corresponding mem cfgs
+                      nvsim_best_case_input_cfg = nvmexplorer_src.input_defs.nvsim_interface.NVSimInputConfig(mem_cfg_file_path = best_case_cfg_path, process_node = process_node,
+                                                       opt_target = _opt_target,
+                                                       word_width = word_width,
+                                                       capacity = _capacity,
+                                                       cell_type = best_case_cell_cfg)
+
+                      nvsim_worst_case_input_cfg = nvmexplorer_src.input_defs.nvsim_interface.NVSimInputConfig(mem_cfg_file_path = worst_case_cfg_path, process_node = process_node,
+                                                       opt_target = _opt_target,
+                                                       word_width = word_width,
+                                                       capacity = _capacity,
+                                                       cell_type = worst_case_cell_cfg)
+
+                      nvsim_worst_case_input_cfg.generate_mem_cfg()
+                      nvsim_best_case_input_cfg.generate_mem_cfg()
+
+                      worst_output_path = "{}/nvsim_output/{}_{}MB_{}_{}BPC_{}b-worst_case_nvsim_output.pkl".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, word_width)
+                      best_output_path = "{}/nvsim_output/{}_{}MB_{}_{}BPC_{}b-best_case_nvsim_output.pkl".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, word_width)
+                      #group paths to be compatible with run_nvsim parallelism
+                      cell_paths = [worst_case_cell_path, best_case_cell_path]
+                      cell_cfgs = [worst_case_cell_cfg, best_case_cell_cfg]
+                      output_paths = [worst_output_path, best_output_path]
+                      stdout_logs = [worst_case_stdout_log, best_case_stdout_log]
+                      stderr_logs = [worst_case_stderr_log, best_case_stderr_log]
+                      cfg_paths = [worst_case_cfg_path, best_case_cfg_path]
+                      nvsim_input_cfgs = [nvsim_worst_case_input_cfg, nvsim_best_case_input_cfg]
+                  else: #initialize cell configs according to input over-rides or default settings
+                      cell_paths = []
+                      cell_cfgs = []
+                      output_paths = []
+                      stdout_logs = []
+                      stderr_logs = []
+                      cfg_paths = []
+                      nvsim_input_cfgs = []
+
+                      if len(config["custom_cells"]) == 0: #use default values per technology
+                        this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, {"name":"default", "bits_per_cell":_bits_per_cell})
+                        this_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC_{}.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell, "default")
+                        nvsim_input_cfg = nvmexplorer_src.input_defs.nvsim_interface.NVSimInputConfig(mem_cfg_file_path = this_cfg_path, 
+                                                       process_node = process_node,
+                                                       opt_target = _opt_target,
+                                                       word_width = word_width,
+                                                       capacity = _capacity,
+                                                       cell_type = this_cell_cfg)
+
+                        nvsim_input_cfg.generate_mem_cfg()
+                        #assign paths for default cell
+                        cell_paths.append(this_cell_path)
+                        cell_cfgs.append(this_cell_cfg)
+                        cfg_paths.append(this_cfg_path)
+                        nvsim_input_cfgs.append(nvsim_input_cfg)
+                        output_paths.append("{}/nvsim_output/{}_{}MB_{}BPC_{}b_{}_nvsim_output.pkl".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, word_width, "default"))
+                        stdout_logs.append("{}/logs/{}_{}MB_{}_{}BPC_{}_output".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, "default"))
+                        stderr_logs.append("{}/logs/{}_{}MB_{}_{}BPC_{}_error".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, "default"))
+                      #else:
+                        #TODO; gen cell based on inputs
+                  # Run modified nvsim on cell configs
+                  nvsim_outputs = run_nvsim(output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, cfg_paths, nvsim_input_cfgs, output_dir)
+
+                  # Report results, add cell config params, mem config params, and whatever we are sweeping to the header
+                  for i in range(len(nvsim_outputs)):
+                      result = ExperimentResult(access_pattern, nvsim_input_cfgs[i], nvsim_outputs[i])
+                      result.evaluate() 
  
-                  print("Retrieved Array-Level Results; Running Analytical Model")
+                      print("Retrieved Array-Level Results; Running Analytical Model")
                      
-                  # Run application-level sweeps and save results
-                  #FIXME also add conditional for customized traffic inputs
-                  if len(traffic) > 0:
-                      # First function call prints header to the spreadsheet, second one prints to csv. Only need to report the header once
-                      best_case_result.report_header_benchmark(1, results_csv, best_case_cell_path, best_case_cfg_path) 
+                      # Run application-level sweeps and save results
+                      #FIXME also add conditional for customized traffic inputs
+                      if len(traffic) > 0:
+                          # First function call prints header to the spreadsheet, second one prints to csv. Only need to report the header once
+                          result.report_header_benchmark(1, results_csv, cell_paths[i], cfg_paths[i]) 
                           
-                      if "generic" in traffic:
-                          # GENERIC traffic sweep; report all outputs  
-                          generic_traffic(access_pattern, nvsim_best_case_input_cfg, nvsim_best_case_output, nvsim_worst_case_input_cfg, nvsim_worst_case_output, results_csv, best_case_cell_path, best_case_cfg_path, worst_case_cell_path, worst_case_cfg_path)
+                          if "generic" in traffic:
+                              # GENERIC traffic sweep; report all outputs  
+                              generic_traffic(access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths)
                               
-                      if "graph" in traffic:
-                          # Graph traffic sweep
-                          graph_traffic(graph8MB, access_pattern, nvsim_best_case_input_cfg, nvsim_best_case_output, nvsim_worst_case_input_cfg, nvsim_worst_case_output, results_csv, best_case_cell_path, best_case_cfg_path, worst_case_cell_path, worst_case_cfg_path)
+                          if "graph" in traffic:
+                              # Graph traffic sweep
+                              graph_traffic(graph8MB, access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths)
 
-                      if "dnn" in traffic:
-                          # DNN traffic sweep
-                          dnn_traffic(DNN_weights, DNN_weights_acts, access_pattern, nvsim_best_case_input_cfg, nvsim_best_case_output, nvsim_worst_case_input_cfg, nvsim_worst_case_output, results_csv, best_case_cell_path, best_case_cfg_path, worst_case_cell_path, worst_case_cfg_path)
+                          if "dnn" in traffic:
+                              # DNN traffic sweep
+                              dnn_traffic(DNN_weights, DNN_weights_acts, access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths)
 
-                      if "spec" in traffic:
-                          # SPEC2017 traffic
-                          spec_traffic(spec8MBLLC, spec16MBLLC, spec16MBDRAM, spec16MBL2, spec32MBLLC, spec64MBLLC, access_pattern, nvsim_best_case_input_cfg, nvsim_best_case_output, nvsim_worst_case_input_cfg, nvsim_worst_case_output, results_csv, best_case_cell_path, best_case_cfg_path, worst_case_cell_path, worst_case_cfg_path)
+                          if "spec" in traffic:
+                              # SPEC2017 traffic
+                              spec_traffic(spec8MBLLC, spec16MBLLC, spec16MBDRAM, spec16MBL2, spec32MBLLC, spec64MBLLC, access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths)
 
-                      if "generic_write_buff" in traffic:
-                          #next, run generic traffic with write buffer proxy
-                          generic_traffic_with_write_buff(access_pattern, nvsim_best_case_input_cfg, nvsim_best_case_output, nvsim_worst_case_input_cfg, nvsim_worst_case_output, results_csv, best_case_cell_path, best_case_cfg_path, worst_case_cell_path, worst_case_cfg_path)
+                          if "generic_write_buff" in traffic:
+                              #next, run generic traffic with write buffer proxy
+                              generic_traffic_with_write_buff(access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths)
       
       combine_csv(_cell_type, _bits_per_cell)
       print("Reported Results; Evaluation Complete")

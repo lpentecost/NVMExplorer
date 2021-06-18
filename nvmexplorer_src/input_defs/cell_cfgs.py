@@ -82,8 +82,8 @@ class RRAMCellConfig(NVSimCellConfig):
   def __init__(self,
         cell_file_path="../../data/cell_cfgs/RRAM.cell", 
         # using parameters from sample RRAM cell shipped with NVSIM as defaults
-		access_CMOS_width=6, #width of access (F)
-        cell_area_F2= 4,
+	access_CMOS_width=6, #width of access (F)
+        cell_area_F2= 53,
         r_on_set_v = 100000, #ohm
         r_off_set_v = 10000000, #ohm
         r_on_reset_v = 100000, #ohm
@@ -93,8 +93,8 @@ class RRAMCellConfig(NVSimCellConfig):
         r_on_half_reset = 500000, #ohm
         cap_on = '1e-16', #F
         cap_off = '1e-16', #F
-		read_mode = "current",
-		read_voltage = 0.4, #V
+	read_mode = "current",
+	read_voltage = 0.4, #V
         read_power = 0.16, #uW 
         reset_mode = "voltage",
         reset_voltage = 2.0, #V
@@ -104,9 +104,9 @@ class RRAMCellConfig(NVSimCellConfig):
         set_voltage = 2.0, #V
         set_pulse = 10, #ns
         set_energy = 0.6, #pJ
-		mlc = 1, #bits per cell
-		read_floating = False,
-    		mem_cfg_base = '''
+	mlc = 1, #bits per cell
+	read_floating = False,
+    	mem_cfg_base = '''
 -DesignTarget: RAM
 -DeviceRoadmap: LOP
 -LocalWireType: LocalAggressive
@@ -261,22 +261,22 @@ class PCMCellConfig(NVSimCellConfig):
   def __init__(self,
         cell_file_path="../../data/cell_cfgs/PCM.cell", 
         # using parameters from sample PCM cell shipped with NVSIM as defaults
-		access_CMOS_width=6, #width of access (F)
-        cell_area_F2=9,
+        access_CMOS_width=6, #width of access (F)
+        cell_area_F2=19,
         r_on = 1000, #ohm
         r_off = 1000000, #ohm
-		read_mode = "voltage",
-		read_current = 40, #uA
-		read_voltage = 0, #V
+	read_mode = "voltage",
+	read_current = 40, #uA
+	read_voltage = 1, #V
         read_energy = 2, # pJ
         reset_mode = "current",
-        reset_current = 300, #uA
+        reset_current = 10, #uA
         reset_pulse = 40, #ns
         set_mode = "current",
-        set_current = 150, #uA
+        set_current = 0.2, #uA
         set_pulse = 150, #ns
-		mlc = 1, #bits per cell
-    		mem_cfg_base = '''
+	mlc = 1, #bits per cell
+    	mem_cfg_base = '''
 -DesignTarget: RAM
 -DeviceRoadmap: LOP
 -LocalWireType: LocalAggressive

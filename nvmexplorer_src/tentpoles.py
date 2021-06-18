@@ -180,3 +180,66 @@ def form_tentpoles(data_df, cell_type, bits_per_cell):
 
   return best_case_cell_path, worst_case_cell_path, best_case_cell_cfg, worst_case_cell_cfg
 
+##TODO; also have a generator that scrapes other characteristics from survey results
+
+
+## Generate cell configuration from user input
+def gen_custom_cell(cell_type, custom_cell_inputs):
+  """ Generates NVSim cell files for a specified cell type and input characteristics
+
+  :param cell_type: String specifying which NVM technology to use
+  :type cell_type: String
+  :param custom_cell_inputs: dictionary object specifying possible input params to cell def
+  :return: path to NVSim cell file and :class:`NVSimInputConfig` object containing NVSim input cfgs 
+  """
+  
+  ## Form cell cfgs and mem cfgs for best-case and worst-case default technologies
+  cell_path = "data/cell_cfgs/{}_{}.cell".format(cell_type, custom_cell_inputs["name"])
+ 
+  # depending on cell type, initialize default cell, then over-write params as provided, then generate cell file
+ 
+  if (cell_type == 'STT'):
+      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.STTRAMCellConfig(
+          cell_file_path=cell_path,
+         )
+      
+      cell_cfg.generate_cell_file()
+      cell_cfg.append_cell_file()
+  
+  elif (cell_type == 'PCM'):
+      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.PCMCellConfig(
+          cell_file_path=cell_path,
+         )
+      
+      cell_cfg.generate_cell_file()
+      cell_cfg.append_cell_file()
+  
+  elif (cell_type == 'CTT'): #FIXME fill in with details
+    cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.CTTCellConfig()
+ 
+  elif (cell_type == 'RRAM'):
+      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.RRAMCellConfig(
+          cell_file_path=cell_path
+         )
+      
+      cell_cfg.generate_cell_file()
+      cell_cfg.append_cell_file()
+
+  elif (cell_type == 'FeFET'):
+      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.FeFETCellConfig(
+          cell_file_path=cell_path
+         )
+      
+      cell_cfg.cell_ratio = 1.0
+      cell_cfg.generate_cell_file()
+      cell_cfg.append_cell_file()
+ 
+  else:
+      #Base SRAM cell
+      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.SRAMCellConfig(
+          cell_area_F2 = 146,
+          cell_file_path=cell_path)
+      cell_cfg.generate_cell_file()
+      cell_cfg.append_cell_file()
+
+  return cell_path, cell_cfg
