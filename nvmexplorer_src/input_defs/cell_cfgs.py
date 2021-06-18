@@ -183,12 +183,12 @@ class STTRAMCellConfig(NVSimCellConfig):
   def __init__(self,
         cell_file_path="../../data/cell_cfgs/STTRAM.cell", 
         # using parameters from sample RRAM cell shipped with NVSIM as defaults
-		access_CMOS_width=6, #width of access (F)
+	access_CMOS_width=6, #width of access (F)
         cell_area_F2 = 54,
         r_on = 3000, #ohm
         r_off = 6000, #ohm
-		read_mode = "current",
-		read_voltage = 0.25, #V
+	read_mode = "current",
+	read_voltage = 0.25, #V
         min_sense_voltage = 25, #mV
         read_power = 30, #uW 
         reset_mode = "current",
@@ -199,9 +199,9 @@ class STTRAMCellConfig(NVSimCellConfig):
         set_current = 80, #uA
         set_pulse = 10, #ns
         set_energy = 1, #pJ
-		mlc = 1, #bits per cell
-		read_floating = False,
-    		mem_cfg_base = '''
+	mlc = 1, #bits per cell
+	read_floating = False,
+    	mem_cfg_base = '''
 -DesignTarget: RAM
 -DeviceRoadmap: LOP
 -LocalWireType: LocalAggressive
@@ -332,8 +332,8 @@ class FeFETCellConfig(NVSimCellConfig):
   def __init__(self,
         cell_file_path="../../data/cell_cfgs/FeFET.cell", 
         # using parameters from ND 500domain cell (write with verify) as defaults
-	    access_CMOS_width=0.01, #width of access (F)
-	    access_Vdrop=0.01, #voltage drop access device (V)
+	access_CMOS_width=0.01, #width of access (F)
+	access_Vdrop=0.01, #voltage drop access device (V)
         cell_area_F2= 15,
         r_on_set_v = 3e4, #ohm
         r_off_set_v = 3e4, #ohm
@@ -355,8 +355,8 @@ class FeFETCellConfig(NVSimCellConfig):
         set_voltage = 2.0, #V
         set_pulse = 20, #ns
         set_energy = 0.0029, #pJ
-	    mlc = 1, #bits per cell
-	    read_floating = False,
+	mlc = 1, #bits per cell
+	read_floating = False,
     	mem_cfg_base = '''
 -DesignTarget: RAM
 -DeviceRoadmap: LSTP
@@ -374,6 +374,7 @@ class FeFETCellConfig(NVSimCellConfig):
 		):
     NVSimCellConfig.__init__(self, cell_file_path=cell_file_path, cell_area=cell_area_F2)
     self.mem_cell_type = "FeFET"
+    self.cell_area=cell_area_F2
     self.cell_file_path=cell_file_path
     self.access_CMOS_width = access_CMOS_width
     self.access_Vdrop = access_Vdrop

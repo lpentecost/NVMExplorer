@@ -202,7 +202,12 @@ def gen_custom_cell(cell_type, custom_cell_inputs):
       cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.STTRAMCellConfig(
           cell_file_path=cell_path,
          )
-      
+
+      # depending on exposed parameters per technology, check and assign input values
+      if "cell_size_F2" in custom_cell_inputs:
+          cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+
+ 
       cell_cfg.generate_cell_file()
       cell_cfg.append_cell_file()
   
@@ -210,17 +215,32 @@ def gen_custom_cell(cell_type, custom_cell_inputs):
       cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.PCMCellConfig(
           cell_file_path=cell_path,
          )
+
+      # depending on exposed parameters per technology, check and assign input values
+      if "cell_size_F2" in custom_cell_inputs:
+          cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+
       
       cell_cfg.generate_cell_file()
       cell_cfg.append_cell_file()
   
   elif (cell_type == 'CTT'): #FIXME fill in with details
-    cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.CTTCellConfig()
+      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.CTTCellConfig()
+
+      # depending on exposed parameters per technology, check and assign input values
+      if "cell_size_F2" in custom_cell_inputs:
+          cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+
  
   elif (cell_type == 'RRAM'):
       cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.RRAMCellConfig(
           cell_file_path=cell_path
          )
+
+      # depending on exposed parameters per technology, check and assign input values
+      if "cell_size_F2" in custom_cell_inputs:
+          cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+
       
       cell_cfg.generate_cell_file()
       cell_cfg.append_cell_file()
@@ -229,6 +249,11 @@ def gen_custom_cell(cell_type, custom_cell_inputs):
       cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.FeFETCellConfig(
           cell_file_path=cell_path
          )
+
+      # depending on exposed parameters per technology, check and assign input values
+      if "cell_size_F2" in custom_cell_inputs:
+          cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+
       
       cell_cfg.cell_ratio = 1.0
       cell_cfg.generate_cell_file()
@@ -239,6 +264,11 @@ def gen_custom_cell(cell_type, custom_cell_inputs):
       cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.SRAMCellConfig(
           cell_area_F2 = 146,
           cell_file_path=cell_path)
+
+      # depending on exposed parameters per technology, check and assign input values
+      if "cell_size_F2" in custom_cell_inputs:
+          cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+
       cell_cfg.generate_cell_file()
       cell_cfg.append_cell_file()
 

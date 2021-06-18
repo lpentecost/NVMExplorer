@@ -1,0 +1,18 @@
+{"experiment": {
+    "exp_name":"example_custom_cells",  
+    "cell_type":["SRAM", "STT", "RRAM", "PCM", "FeFET"],
+    "opt_target":["ReadEDP"],
+    "capacity":[1],
+    "traffic":["generic", "generic_write_buff", "dnn", "graph", "spec"],
+    "nvsim_path":"./nvmexplorer_src/nvsim_src/nvsim",
+    "output_path":"./output",
+    "custom_cells": "True"
+},
+"custom_cells": [  {"cell_type": "SRAM", "cell_size_F2": 140 }, 
+                   {"cell_type": "STT", "cell_size_F2": 75 },
+                   {"cell_type": "RRAM", "cell_size_F2": 46 },
+                   {"cell_type": "PCM", "cell_size_F2": 36 },
+                   {"cell_type": "FeFET", "cell_size_F2": 50 },
+                   {"cell_type": "FeFET", "cell_size_F2": 100 }
+]
+}  

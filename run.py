@@ -269,11 +269,35 @@ if __name__ == '__main__':
                         cell_cfgs.append(this_cell_cfg)
                         cfg_paths.append(this_cfg_path)
                         nvsim_input_cfgs.append(nvsim_input_cfg)
-                        output_paths.append("{}/nvsim_output/{}_{}MB_{}BPC_{}b_{}_nvsim_output.pkl".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, word_width, "default"))
+                        output_paths.append("{}/nvsim_output/{}_{}MB_{}_{}BPC_{}b_{}_nvsim_output.pkl".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, word_width, "default"))
                         stdout_logs.append("{}/logs/{}_{}MB_{}_{}BPC_{}_output".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, "default"))
                         stderr_logs.append("{}/logs/{}_{}MB_{}_{}BPC_{}_error".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, "default"))
-                      #else:
-                        #TODO; gen cell based on inputs
+                      else:
+                        for i in range(len(config["custom_cells"])):
+                          this_custom_cell_input = config["custom_cells"][i]
+                          #if no name, assign a unique one
+                          if this_custom_cell_input["cell_type"] == _cell_type:
+                            if not "name" in this_custom_cell_input:
+                              this_custom_cell_input["name"] = "custom"+_cell_type+str(i)
+                            this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, this_custom_cell_input)
+                            this_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC_{}.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell, this_custom_cell_input["name"])
+                            nvsim_input_cfg = nvmexplorer_src.input_defs.nvsim_interface.NVSimInputConfig(mem_cfg_file_path = this_cfg_path, 
+                                                       process_node = process_node,
+                                                       opt_target = _opt_target,
+                                                       word_width = word_width,
+                                                       capacity = _capacity,
+                                                       cell_type = this_cell_cfg)
+
+                            nvsim_input_cfg.generate_mem_cfg()
+                            #assign paths for custom cell
+                            cell_paths.append(this_cell_path)
+                            cell_cfgs.append(this_cell_cfg)
+                            cfg_paths.append(this_cfg_path)
+                            nvsim_input_cfgs.append(nvsim_input_cfg)
+                            output_paths.append("{}/nvsim_output/{}_{}MB_{}_{}BPC_{}b_{}_nvsim_output.pkl".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, word_width, this_custom_cell_input["name"]))
+                            stdout_logs.append("{}/logs/{}_{}MB_{}_{}BPC_{}_output".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, this_custom_cell_input["name"]))
+                            stderr_logs.append("{}/logs/{}_{}MB_{}_{}BPC_{}_error".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, this_custom_cell_input["name"]))
+
                   # Run modified nvsim on cell configs
                   nvsim_outputs = run_nvsim(output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, cfg_paths, nvsim_input_cfgs, output_dir)
 
