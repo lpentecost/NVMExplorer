@@ -1,0 +1,30 @@
+{"experiment": {
+    "exp_name":"fefet_custom_example",  
+    "cell_type":["FeFET"],
+    "opt_target":["ReadEDP"],
+    "capacity":[1],
+    "traffic":["generic", "dnn", "graph", "spec"],
+    "nvsim_path":"./nvmexplorer_src/nvsim_src/nvsim",
+    "output_path":"./output",
+    "custom_cells": "True"
+},
+"custom_cells": [  {"cell_type": "FeFET", "name": "myNewBEOLFeFET", 
+                    "cell_size_F2": 15,
+                    "read_voltage": -0.03,
+                    "read_power": 0.0014,
+                    "r_on_set_v": 4.7e4,
+                    "r_off_set_v": 4.7e4,
+                    "r_on_reset_v": 7.2e9,
+                    "r_off_reset_v": 7.8e9,
+                    "r_on_read_v": 1.8e6,
+                    "r_off_read_v": 1.9e10,
+                    "r_on_half_reset": 2.3e10,
+                    "reset_voltage": -2.0,
+                    "set_voltage": 2.0,
+                    "set_pulse": 20,
+                    "reset_pulse": 20,
+                    "set_energy": 0.0029,
+                    "reset_energy": 2e-4
+                     }
+]
+}  
