@@ -1,8 +1,10 @@
 # exclude generated cell defs, outputs, etc.
 data/cell_cfgs/*_case.cell
+data/cell_cfgs/*_*.cell
 data/mem_cfgs/*.cfg
 output/results/*
 output/logs/*
 output/nvsim_output/*
 *__pycache__*
 *.pyc
+*.DS_Store*
