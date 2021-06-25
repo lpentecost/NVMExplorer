@@ -110,7 +110,7 @@ class ExperimentResult:
     cell_headers.extend(row_to_insert)
     row_to_insert = cell_headers
 
-    with open(csv_file_path, "a+") as fp:
+    with open(csv_file_path, "a+", newline='') as fp:
       wr = csv.writer(fp, dialect='excel')
       wr.writerow(row_to_insert)
 
@@ -140,7 +140,7 @@ class ExperimentResult:
     cell_vals.extend(row_to_insert)
     row_to_insert = cell_vals
     
-    with open(csv_file_path, "a") as fp:
+    with open(csv_file_path, "a", newline='') as fp:
       wr = csv.writer(fp, dialect='excel')
       wr.writerow(row_to_insert)
  
