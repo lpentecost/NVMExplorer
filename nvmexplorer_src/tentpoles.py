@@ -206,8 +206,41 @@ def gen_custom_cell(cell_type, custom_cell_inputs):
       # depending on exposed parameters per technology, check and assign input values
       if "cell_size_F2" in custom_cell_inputs:
           cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+      if "access_CMOS_width" in custom_cell_inputs:
+          cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
+      if "r_on" in custom_cell_inputs:
+          cell_cfg.r_on = custom_cell_inputs["r_on"]  
+      if "r_off" in custom_cell_inputs:
+          cell_cfg.r_off = custom_cell_inputs["r_off"]  
+      if "read_mode" in custom_cell_inputs:
+          cell_cfg.read_mode = custom_cell_inputs["read_mode"]  
+      if "read_voltage" in custom_cell_inputs:
+          cell_cfg.read_voltage = custom_cell_inputs["read_voltage"]  
+      if "min_sense_voltage" in custom_cell_inputs:
+          cell_cfg.min_sense_voltage = custom_cell_inputs["min_sense_voltage"]  
+      if "read_power" in custom_cell_inputs:
+          cell_cfg.read_power = custom_cell_inputs["read_power"]  
+      if "reset_mode" in custom_cell_inputs:
+          cell_cfg.reset_mode = custom_cell_inputs["reset_mode"]  
+      if "reset_current" in custom_cell_inputs:
+          cell_cfg.reset_current = custom_cell_inputs["reset_current"]  
+      if "reset_pulse" in custom_cell_inputs:
+          cell_cfg.reset_pulse = custom_cell_inputs["reset_pulse"]  
+      if "reset_energy" in custom_cell_inputs:
+          cell_cfg.reset_energy = custom_cell_inputs["reset_energy"]  
+      if "set_mode" in custom_cell_inputs:
+          cell_cfg.set_mode = custom_cell_inputs["set_mode"]  
+      if "set_current" in custom_cell_inputs:
+          cell_cfg.set_current = custom_cell_inputs["set_current"]  
+      if "set_pulse" in custom_cell_inputs:
+          cell_cfg.set_pulse = custom_cell_inputs["set_pulse"]  
+      if "set_energy" in custom_cell_inputs:
+          cell_cfg.set_energy = custom_cell_inputs["set_energy"]  
+      if "mlc" in custom_cell_inputs:
+          cell_cfg.mlc = custom_cell_inputs["mlc"]  
+      if "read_floating" in custom_cell_inputs:
+          cell_cfg.read_floating = custom_cell_inputs["read_floating"]  
 
- 
       cell_cfg.generate_cell_file()
       cell_cfg.append_cell_file()
   
@@ -297,11 +330,13 @@ def gen_custom_cell(cell_type, custom_cell_inputs):
           cell_cfg.set_pulse = custom_cell_inputs["set_pulse"]  
       if "set_energy" in custom_cell_inputs:
           cell_cfg.set_energy = custom_cell_inputs["set_energy"]  
+      if "mlc" in custom_cell_inputs:
+          cell_cfg.mlc = custom_cell_inputs["mlc"]  
 
       cell_cfg.cell_ratio = 1.0
       cell_cfg.generate_cell_file()
       cell_cfg.append_cell_file()
- 
+
   else:
       #Base SRAM cell
       cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.SRAMCellConfig(

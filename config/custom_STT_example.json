@@ -1,0 +1,22 @@
+{"experiment": {
+    "exp_name":"stt_custom_example",  
+    "cell_type":["STT"],
+    "opt_target":["ReadEDP"],
+    "capacity":[1],
+    "traffic":["generic", "dnn", "graph", "spec"],
+    "nvsim_path":"./nvmexplorer_src/nvsim_src/nvsim",
+    "output_path":"./output",
+    "custom_cells": "True"
+},
+"custom_cells": [  {"cell_type": "STT", "name": "myNewSTT", 
+                    "cell_size_F2": 75,
+                    "r_on": 1e3,
+                    "r_off": 4e4,
+                    "read_voltage": 0.6,
+                    "set_pulse": 20,
+                    "reset_pulse": 20,
+                    "set_energy": 4.5,
+                    "reset_energy": 4.5
+                     }
+]
+}  
