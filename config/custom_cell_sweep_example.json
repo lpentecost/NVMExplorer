@@ -1,0 +1,35 @@
+{"experiment": {
+    "exp_name":"sweep_custom_examples",  
+    "cell_type":["STT", "PCM", "SRAM", "RRAM"],
+    "opt_target":["ReadEDP"],
+    "capacity":[1],
+    "traffic":["generic", "dnn", "graph", "spec"],
+    "nvsim_path":"./nvmexplorer_src/nvsim_src/nvsim",
+    "output_path":"./output",
+    "custom_cells": "True"
+},
+"custom_cells": [  {"cell_type": "STT", "name": "myNewSTT", 
+                    "cell_size_F2": 75,
+                    "r_on": 1e3,
+                    "r_off": 4e4,
+                    "read_voltage": 0.6,
+                    "set_pulse": 20,
+                    "reset_pulse": 20,
+                    "set_energy": 4.5,
+                    "reset_energy": 4.5
+                     },
+                   {"cell_type": "PCM", "name": "myNewPCM", 
+                    "cell_size_F2": 25,
+                    "r_on": 1e4,
+                    "r_off": 1e6,
+                    "read_voltage": 1.0
+                     },
+                   {"cell_type": "RRAM", "name": "myNewRRAM", 
+                    "cell_size_F2": 53,
+                    "read_voltage": 0.7
+                     },
+                   {"cell_type": "SRAM", "name": "myNewSRAM", 
+                    "cell_size_F2": 146
+                     }
+]
+}  

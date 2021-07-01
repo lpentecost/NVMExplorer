@@ -252,7 +252,34 @@ def gen_custom_cell(cell_type, custom_cell_inputs):
       # depending on exposed parameters per technology, check and assign input values
       if "cell_size_F2" in custom_cell_inputs:
           cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
-
+      if "access_CMOS_width" in custom_cell_inputs:
+          cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
+      if "r_on" in custom_cell_inputs:
+          cell_cfg.r_on = custom_cell_inputs["r_on"]  
+      if "r_off" in custom_cell_inputs:
+          cell_cfg.r_off = custom_cell_inputs["r_off"]  
+      if "read_mode" in custom_cell_inputs:
+          cell_cfg.read_mode = custom_cell_inputs["read_mode"]  
+      if "read_voltage" in custom_cell_inputs:
+          cell_cfg.read_voltage = custom_cell_inputs["read_voltage"]  
+      if "read_current" in custom_cell_inputs:
+          cell_cfg.read_current = custom_cell_inputs["read_current"]  
+      if "read_energy" in custom_cell_inputs:
+          cell_cfg.read_energy = custom_cell_inputs["read_energy"]  
+      if "reset_mode" in custom_cell_inputs:
+          cell_cfg.reset_mode = custom_cell_inputs["reset_mode"]  
+      if "reset_current" in custom_cell_inputs:
+          cell_cfg.reset_current = custom_cell_inputs["reset_current"]  
+      if "reset_pulse" in custom_cell_inputs:
+          cell_cfg.reset_pulse = custom_cell_inputs["reset_pulse"]  
+      if "set_mode" in custom_cell_inputs:
+          cell_cfg.set_mode = custom_cell_inputs["set_mode"]  
+      if "set_current" in custom_cell_inputs:
+          cell_cfg.set_current = custom_cell_inputs["set_current"]  
+      if "set_pulse" in custom_cell_inputs:
+          cell_cfg.set_pulse = custom_cell_inputs["set_pulse"]  
+      if "mlc" in custom_cell_inputs:
+          cell_cfg.mlc = custom_cell_inputs["mlc"]  
       
       cell_cfg.generate_cell_file()
       cell_cfg.append_cell_file()
@@ -273,7 +300,52 @@ def gen_custom_cell(cell_type, custom_cell_inputs):
       # depending on exposed parameters per technology, check and assign input values
       if "cell_size_F2" in custom_cell_inputs:
           cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
-
+      if "access_CMOS_width" in custom_cell_inputs:
+          cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
+      if "r_on_set_v" in custom_cell_inputs:
+          cell_cfg.r_on_set_v = custom_cell_inputs["r_on_set_v"]
+      if "r_off_set_v" in custom_cell_inputs:
+          cell_cfg.r_off_set_v = custom_cell_inputs["r_off_set_v"]
+      if "r_on_reset_v" in custom_cell_inputs:
+          cell_cfg.r_on_reset_v = custom_cell_inputs["r_on_reset_v"]
+      if "r_off_reset_v" in custom_cell_inputs:
+          cell_cfg.r_off_reset_v = custom_cell_inputs["r_off_reset_v"]
+      if "r_on_read_v" in custom_cell_inputs:
+          cell_cfg.r_on_read_v = custom_cell_inputs["r_on_read_v"]
+      if "r_off_read_v" in custom_cell_inputs:
+          cell_cfg.r_off_read_v = custom_cell_inputs["r_off_read_v"]
+      if "r_on_half_reset" in custom_cell_inputs:
+          cell_cfg.r_on_half_reset = custom_cell_inputs["r_on_half_reset"]
+      if "cap_on" in custom_cell_inputs:
+          cell_cfg.cap_on = custom_cell_inputs["cap_on"]
+      if "cap_off" in custom_cell_inputs:
+          cell_cfg.cap_off = custom_cell_inputs["cap_off"]
+      if "read_mode" in custom_cell_inputs:
+          cell_cfg.read_mode = custom_cell_inputs["read_mode"]  
+      if "read_voltage" in custom_cell_inputs:
+          cell_cfg.read_voltage = custom_cell_inputs["read_voltage"]  
+      if "read_power" in custom_cell_inputs:
+          cell_cfg.read_power = custom_cell_inputs["read_power"]  
+      if "reset_mode" in custom_cell_inputs:
+          cell_cfg.reset_mode = custom_cell_inputs["reset_mode"]  
+      if "reset_voltage" in custom_cell_inputs:
+          cell_cfg.reset_voltage = custom_cell_inputs["reset_voltage"]  
+      if "reset_pulse" in custom_cell_inputs:
+          cell_cfg.reset_pulse = custom_cell_inputs["reset_pulse"]  
+      if "reset_energy" in custom_cell_inputs:
+          cell_cfg.reset_energy = custom_cell_inputs["reset_energy"]  
+      if "set_mode" in custom_cell_inputs:
+          cell_cfg.set_mode = custom_cell_inputs["set_mode"]  
+      if "set_voltage" in custom_cell_inputs:
+          cell_cfg.set_voltage = custom_cell_inputs["set_voltage"]  
+      if "set_pulse" in custom_cell_inputs:
+          cell_cfg.set_pulse = custom_cell_inputs["set_pulse"]  
+      if "set_energy" in custom_cell_inputs:
+          cell_cfg.set_energy = custom_cell_inputs["set_energy"]  
+      if "mlc" in custom_cell_inputs:
+          cell_cfg.mlc = custom_cell_inputs["mlc"]  
+      if "read_floating" in custom_cell_inputs:
+          cell_cfg.read_floating = custom_cell_inputs["read_floating"]  
       
       cell_cfg.generate_cell_file()
       cell_cfg.append_cell_file()
@@ -346,6 +418,14 @@ def gen_custom_cell(cell_type, custom_cell_inputs):
       # depending on exposed parameters per technology, check and assign input values
       if "cell_size_F2" in custom_cell_inputs:
           cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+      if "access_CMOS_width" in custom_cell_inputs:
+          cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
+      if "nmos_width" in custom_cell_inputs:
+          cell_cfg.nmos_width = custom_cell_inputs["nmos_width"]
+      if "pmos_width" in custom_cell_inputs:
+          cell_cfg.pmos_width = custom_cell_inputs["pmos_width"]
+      if "read_mode" in custom_cell_inputs:
+          cell_cfg.read_mode = custom_cell_inputs["read_mode"]
 
       cell_cfg.generate_cell_file()
       cell_cfg.append_cell_file()
