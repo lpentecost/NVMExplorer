@@ -29,6 +29,10 @@ WIP details per techonology; see nvmexplorer_src/input_defs/cell_cfgs.py for mor
 
 | Option | Description | Applicable Technologies |
 | ------ | ----- | ----- |
-| cell_type | description | ALL |
-| cell_size_F2 | description | ALL |
-
+| cell_type | technology type [SRAM, STT, PCM, RRAM, MLCRRAM, FeFET, MLCFeFET, CTT, MLCCTT] | ALL |
+| cell_size_F2 | area of memory cell in F2 | ALL |
+| access_CMOS_width | width of access transistor for CMOS access in F | ALL |
+| r_on | Resistance value [ohm] of "on" or highest programmed cell state | STT, PCM |
+| r_off | Resistance value [ohm] of "off" cell state | STT, PCM |
+| read_mode | Select "voltage" read mode vs. "current" read mode | ALL |
+| read_voltage | Read Voltage value (V) |  STT, PCM, (MLC)RRAM, (MLC)FeFET | 
