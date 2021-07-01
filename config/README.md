@@ -21,3 +21,14 @@ All available configuration options are listed below along with available values
 | traffic | type of application traffic. available options: ["generic", "graph", "dnn", "spec", "generic_write_buff"] |
 | nvsim_path | absolute path for a custom nvsim |
 | output_path | absolute path for a custom output directory |
+| custom_cells | bool; indicates whether or not the user is providing customized cell details |
+
+If custom_cells is set to true, please provide a list of customized cell configurations.  At a minimum, each customized cell configuration includes the cell type (e.g., "PCM", "RRAM") and a unique name to label the corresponding output files (e.g., "myFancyRRAMCell").
+
+WIP details per techonology; see nvmexplorer_src/input_defs/cell_cfgs.py for more details
+
+| Option | Description | Applicable Technologies |
+| ------ | ----- | ----- |
+| cell_type | description | ALL |
+| cell_size_F2 | description | ALL |
+
