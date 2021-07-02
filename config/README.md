@@ -1,8 +1,8 @@
 # NVMExplorer - Config files
 
-NVMExplorer allows for studies to be configured using a JSON format. For reference, we have included a few example config files: example_study.json, another_example_study.json, and bg_fefet_example_study.json. 
+NVMExplorer allows for studies to be configured using a JSON format. For reference, we have included a few example config files. 
 If no options are configured, default values will be used.
-All available configuration options are listed below along with available values where applicable.
+Some available configuration options are listed below along with available values or units where applicable.
 
 | Option | Description | 
 | ------ | ------ |
@@ -25,7 +25,7 @@ All available configuration options are listed below along with available values
 
 If custom_cells is set to true, please provide a list of customized cell configurations.  At a minimum, each customized cell configuration includes the cell type (e.g., "PCM", "RRAM") and a unique name to label the corresponding output files (e.g., "myFancyRRAMCell").
 
-WIP details per techonology; see nvmexplorer_src/input_defs/cell_cfgs.py for more details
+WIP details per techonology; see nvmexplorer_src/input_defs/cell_cfgs.py for more details #FIXME
 
 | Option | Description | Applicable Technologies |
 | ------ | ----- | ----- |
