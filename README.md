@@ -2,7 +2,11 @@ NVMExplorer
 ---------------------
 by Lillian Pentecost and Alexander Hankin, 2021
 
-Please see https://nvmexplorer.seas.harvard.edu for additional documentation and details.
+This is a beta version of a broad design space exploration framework for evaluating and comparing different on-chip memory solutions (including embeddable non-volatile memory technologies such as RRAM, PCM, STT, FeFET, and CTT devices) with system-level constraints and application-level impacts in-the-loop.
+
+Users can configure experiments with customized cell-level parameters, specific memory array design priorities and constraints, and analytically evaluate the performance and efficiency of memory solutions for specific application traffic patterns.  Documentation is a work-in-progress, but templates for various experiments, example cell confiugrations, and example application traffic are provided with sample configurations in the `config' directory.  Additionally, fault injection experiments for different NVM configurations and fault models can be developed and run within `nvmexplorer_src/nvmFI', and surveyed cell-level parameters for various technologies are provided in `output/NVM_data' and leveraged in example studies (see sample configs for details).
+
+Please see https://nvmexplorer.seas.harvard.edu for additional documentation and details, and get started using the instructions below.
 
 
 Getting Started:
@@ -28,12 +32,15 @@ Usage:
 ---------------------
 > python run.py config/[config name].json
 
-Documentation:
+Documentation and Data Visualizations:
 ---------------------
 http://www.nvmexplorer.seas.harvard.edu
 
 Contact:
 ---------------------
+
+Questions, comments, or feature requests?  Please reach out directly:
+
 nvmexplorer@gmail.com
 
 
