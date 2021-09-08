@@ -47,4 +47,4 @@ nvmexplorer@gmail.com
 Citations:
 ---------------------
 
-FIXME; please cite NVMExplorer [insert link]
+If you use or expand on this work, please cite NVMExplorer [https://arxiv.org/abs/2109.01188]
