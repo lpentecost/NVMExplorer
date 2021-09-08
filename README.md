@@ -8,6 +8,8 @@ Users can configure experiments with customized cell-level parameters, specific 
 
 Please see https://nvmexplorer.seas.harvard.edu for additional documentation and details, and get started using the instructions below.
 
+For example studies or to cite this work, please see https://arxiv.org/abs/2109.01188
+
 
 Getting Started:
 --------------------
