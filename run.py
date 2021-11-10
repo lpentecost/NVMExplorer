@@ -78,24 +78,26 @@ def run_nvsim(output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, cfg_p
       with open(stdout_logs[i], "w") as f_out:
         with open(stderr_logs[i], "w") as f_error:
           p1 = subprocess.Popen([nvsim_path, cfg_paths[i]],  stdout=f_out, stderr=f_error)
+          p1.wait()
 
-      nvsim_processes.append(p1)
 
-  for proc in nvsim_processes:
-    proc.wait()
+      #nvsim_processes.append(p1)
+
+  #for proc in nvsim_processes:
+  #  proc.wait()
   
   nvsim_outputs = []
   for i in range(len(output_paths)):
-    if not os.path.exists(output_paths[i]): 
-      nvsim_output = nvmexplorer_src.input_defs.nvsim_interface.parse_nvsim_output(stdout_logs[i], input_cfg=nvsim_input_cfgs[i])
-      if not os.path.exists(output_dir): 
-        os.makedirs(output_dir)
-      nvsim_outputs.append(nvsim_output)
-      pickle.dump(nvsim_output,open(output_paths[i], 'wb'))
+    nvsim_output = nvmexplorer_src.input_defs.nvsim_interface.parse_nvsim_output(stdout_logs[i], input_cfg=nvsim_input_cfgs[i])
+    nvsim_output.print_summary()
+    if not os.path.exists(output_dir): 
+      os.makedirs(output_dir)
+    nvsim_outputs.append(nvsim_output)
+    pickle.dump(nvsim_output,open(output_paths[i], 'wb'))
     # Output already exists - load the pickle(s)
-    else:
-      nvsim_output = pickle.load(open(output_paths[i], 'rb')) 
-      nvsim_outputs.append(nvsim_output)
+    #else:
+    #  nvsim_output = pickle.load(open(output_paths[i], 'rb')) 
+    #  nvsim_outputs.append(nvsim_output)
 
   return nvsim_outputs
 
@@ -304,7 +306,7 @@ if __name__ == '__main__':
                   # Report results, add cell config params, mem config params, and whatever we are sweeping to the header
                   for i in range(len(nvsim_outputs)):
                       result = ExperimentResult(access_pattern, nvsim_input_cfgs[i], nvsim_outputs[i])
-                      result.evaluate() 
+                      result.evaluate()
  
                       print("Retrieved Array-Level Results; Running Analytical Model")
                      
