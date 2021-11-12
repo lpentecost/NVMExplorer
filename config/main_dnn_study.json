@@ -1,0 +1,10 @@
+{"experiment": {
+    "exp_name":"main_dnn_study",  
+    "cell_type":["PCM", "FeFET", "RRAM", "STT", "SRAM"],
+    "opt_target":["ReadEDP", "ReadLatency", "WriteLatency", "WriteEDP", "WriteDynamicEnergy", "ReadDynamicEnergy"],
+    "capacity":[2],
+    "traffic":["dnn"],
+    "nvsim_path":"./nvmexplorer_src/nvsim_src/nvsim",
+    "output_path":"./output"
+}
+}  
