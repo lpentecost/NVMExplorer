@@ -58,15 +58,6 @@ class SRAMCellConfig(NVSimCellConfig):
 
   def append_cell_file(self):
     """ Appends necessary parameters to NVSim cell file to prepare for simulation
-
-    :param startHnd: Start index, defaults to 1
-    :type startHnd: int, optional
-    :param endHnd: End index, defaults to 0xFFFF
-    :type endHnd: int, optional
-    :param uuids: a list of UUID strings, defaults to None
-    :type uuids: list, optional
-    :return: List of returned :class:`bluepy.btle.Characteristic` objects
-    :rtype: list
     """
     cell_file = open(self.cell_file_path, "a+")
     cell_file.write("-AccessCMOSWidth (F): %f\n" % self.access_CMOS_width)
@@ -77,6 +68,55 @@ class SRAMCellConfig(NVSimCellConfig):
     cell_file.write("-MinSenseVoltage (mV): 80\n")
     cell_file.write("-Stitching: 16\n")
     cell_file.close()
+
+class eDRAMCellConfig(NVSimCellConfig):
+  def __init__(self,
+        cell_file_path="../../data/cell_cfgs/eDRAM.cell", 
+		access_CMOS_width=1.31, #width of access (F)
+                cell_area_F2 = 60,
+		read_mode = "voltage",
+                dram_cell_capacitance = '13e-15',
+                reset_voltage = "vdd",
+                set_voltage = "vdd",
+    		mem_cfg_base = '''
+-DesignTarget: RAM
+-DeviceRoadmap: LOP
+-LocalWireType: LocalAggressive
+-LocalWireRepeaterType: RepeatedNone
+-LocalWireUseLowSwing: No
+-GlobalWireType: GlobalAggressive
+-GlobalWireRepeaterType: RepeatedNone
+-GlobalWireUseLowSwing: No
+-Routing: non-H-tree
+-InternalSensing: true
+-Temperature (K): 350
+-RetentionTime (us): 40
+-BufferDesignOptimization: balanced
+'''
+		):
+    NVSimCellConfig.__init__(self, cell_file_path=cell_file_path, cell_area=cell_area_F2)
+    self.mem_cell_type = "eDRAM"
+    self.cell_file_path=cell_file_path
+    self.access_CMOS_width = access_CMOS_width
+    self.read_mode = read_mode
+    self.dram_cell_capacitance = dram_cell_capacitance
+    self.reset_voltage = reset_voltage
+    self.set_voltage = set_voltage
+    self.mem_cfg_base = "-MemoryCellInputFile: " + self.cell_file_path + "\n" + mem_cfg_base + "\n\n" #customize base string for each technology
+    self.mlc = 1
+
+  def append_cell_file(self):
+    """ Appends necessary parameters to NVSim cell file to prepare for simulation
+    """
+    cell_file = open(self.cell_file_path, "a+")
+    cell_file.write("-AccessCMOSWidth (F): %f\n" % self.access_CMOS_width)
+    cell_file.write("-ReadMode: "+self.read_mode+"\n")
+    cell_file.write("-DRAMCellCapacitance (F): "+self.dram_cell_capacitance+"\n")
+    cell_file.write("-ResetVoltage (V): "+self.reset_voltage+"\n")
+    cell_file.write("-SetVoltage (V): "+self.set_voltage+"\n")
+    cell_file.write("-MinSenseVoltage (mV): 10\n")
+    cell_file.close()
+
 
 class RRAMCellConfig(NVSimCellConfig):
   def __init__(self,

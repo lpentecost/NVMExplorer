@@ -1,0 +1,13 @@
+{"experiment": {
+    "exp_name":"destiny_test",  
+    "cell_type":["RRAM"],
+    "opt_target":["WriteEDP"],
+    "capacity":[2],
+    "stacked_die_count":[1, 2, 3],
+    "monolithic_layer_count":[1, 2, 3],
+    "traffic":["generic"],
+    "simulator":"destiny",
+    "sim_path":"../../destiny/destiny",
+    "output_path":"./output"
+}  
+}

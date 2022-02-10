@@ -408,6 +408,20 @@ def gen_custom_cell(cell_type, custom_cell_inputs):
       cell_cfg.cell_ratio = 1.0
       cell_cfg.generate_cell_file()
       cell_cfg.append_cell_file()
+  elif (cell_type == 'eDRAM'):
+      #Base eDRAM cell
+      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.eDRAMCellConfig(
+          cell_area_F2 = 60,
+          cell_file_path=cell_path)
+
+      # depending on exposed parameters per technology, check and assign input values
+      if "cell_size_F2" in custom_cell_inputs:
+          cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+      if "access_CMOS_width" in custom_cell_inputs:
+          cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
+
+      cell_cfg.generate_cell_file()
+      cell_cfg.append_cell_file()
 
   else:
       #Base SRAM cell
