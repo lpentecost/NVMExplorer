@@ -1,0 +1,15 @@
+{"experiment": {
+    "exp_name":"cryo_test",  
+    "cell_type":["SRAM"],
+    "opt_target":["EDP"],
+    "capacity":[2],
+    "stacked_die_count":[1],
+    "monolithic_layer_count":[1],
+    "temperature":[77],
+    "traffic":["generic"],
+    "simulator":"cryomem",
+    "cryomem_path":"../CryoModel/CryoMEM/run.py",
+    "cacti_config_file_path":"../../CryoModel/CryoMEM/configs/cache-sram.cfg",
+    "output_path":"./output"
+}  
+}

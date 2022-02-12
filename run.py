@@ -84,6 +84,17 @@ def set_sim_input_config(simulator, cfg_path, process_node, _opt_target, word_wi
       #                                 word_width = word_width,
       #                                 capacity = _capacity,
       #                                 cell_type = worst_case_cell_cfg)
+  elif simulator == "cryomem":
+      sim_input_cfg = nvmexplorer_src.input_defs.cryomem_interface.CryoMEMInputConfig(mem_cfg_file_path = cfg_path, process_node = process_node,
+                                       opt_target = _opt_target,
+                                       word_width = word_width,
+                                       capacity = _capacity,
+                                       stacked_die_count = _stacked_die_count,
+                                       monolithic_layer_count = _monolithic_layer_count,
+#                                       temperature = temperature, 
+#
+#                                       cacti_config_file_path = cacti_config_file_path,
+                                       cell_type = cell_cfg)
   else: # nvsim
       sim_input_cfg = nvmexplorer_src.input_defs.nvsim_interface.NVSimInputConfig(mem_cfg_file_path = cfg_path, process_node = process_node,
                                        opt_target = _opt_target,
@@ -99,7 +110,7 @@ def set_sim_input_config(simulator, cfg_path, process_node, _opt_target, word_wi
 
   return sim_input_cfg
 
-def run_sim_wrapper(simulator, output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, destiny_path, cfg_paths, sim_input_cfgs, output_dir):
+def run_sim_wrapper(simulator, output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, destiny_path, cryomem_path, cfg_paths, sim_input_cfgs, output_dir):
   """ Wrapper for the run_sim() function
 
   :param simulator: which simulator is used (destiny or nvsim)
@@ -127,6 +138,8 @@ def run_sim_wrapper(simulator, output_paths, log_dir, stdout_logs, stderr_logs, 
 
   if simulator == "destiny":
       sim_outputs = run_sim(simulator, output_paths, log_dir, stdout_logs, stderr_logs, destiny_path, cfg_paths, sim_input_cfgs, output_dir)
+  elif simulator == "cryomem":
+      sim_outputs = run_sim(simulator, output_paths, log_dir, stdout_logs, stderr_logs, cryomem_path, cfg_paths, sim_input_cfgs, output_dir)
   else: #nvsim
       sim_outputs = run_sim(simulator, output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, cfg_paths, sim_input_cfgs, output_dir)
 
@@ -163,13 +176,26 @@ def run_sim(simulator, output_paths, log_dir, stdout_logs, stderr_logs, sim_path
   for i in range(len(output_paths)):
     sim_processes = []
 
+    print("in_run_sim")
+    print(output_paths[i])
     if not os.path.exists(output_paths[i]): 
+      print("BLAH")
       with open(stdout_logs[i], "w") as f_out:
+        print("BLEH")
+        print("simulator: " + simulator)
         with open(stderr_logs[i], "w") as f_error:
-          p1 = subprocess.Popen([sim_path, cfg_paths[i]],  stdout=f_out, stderr=f_error)
-          print(sim_path)
-          print(cfg_paths[i])
-          p1.wait()
+          print("simulator: " + simulator)
+          print("simulator: " + simulator)
+          if simulator == "cryomem":
+            p1 = subprocess.Popen(["python3.8", sim_path, "../CryoModel/CryoMEM/configs/cache-sram.cfg", "77", "22", "1","0.4", "8192", "cache"], stdout=f_out, stderr=f_error)
+            print(sim_path)
+            print(cfg_paths[i])
+            p1.wait()
+          else:
+            p1 = subprocess.Popen([sim_path, cfg_paths[i]],  stdout=f_out, stderr=f_error)
+            print(sim_path)
+            print(cfg_paths[i])
+            p1.wait()
 
 
       #nvsim_processes.append(p1)
@@ -182,6 +208,9 @@ def run_sim(simulator, output_paths, log_dir, stdout_logs, stderr_logs, sim_path
     if simulator == "destiny":
       print(stdout_logs[i])
       sim_output = nvmexplorer_src.input_defs.destiny_interface.parse_destiny_output(stdout_logs[i], input_cfg=sim_input_cfgs[i])
+    elif simulator == "cryomem":
+      print(stdout_logs[i])
+      sim_output = nvmexplorer_src.input_defs.cryomem_interface.parse_cryomem_output(stdout_logs[i], input_cfg=sim_input_cfgs[i])
     else:
       sim_output = nvmexplorer_src.input_defs.nvsim_interface.parse_nvsim_output(stdout_logs[i], input_cfg=sim_input_cfgs[i])
     sim_output.print_summary()
@@ -213,9 +242,12 @@ if __name__ == '__main__':
   bits_per_cell = [1]
   stacked_die_count = [1]
   monolithic_layer_count = [1]
+  temperature = [77]
   traffic = []
   nvsim_path = "nvmexplorer_src/nvsim/nvsim"
   destiny_path = "../destiny/destiny"
+  cryomem_path = "../CryoModel/CryoMEM/run.py"
+  cacti_config_file_path = ""
   output_path = "output"
   cell_tentpoles = True #by default, run a "tentpole" style study
 
@@ -266,6 +298,9 @@ if __name__ == '__main__':
   if "monolithic_layer_count" in config["experiment"]:
       if config["experiment"]["monolithic_layer_count"]:
           monolithic_layer_count = config["experiment"]["monolithic_layer_count"]
+  if "temperature" in config["experiment"]:
+      if config["experiment"]["temperature"]:
+          temperature = config["experiment"]["temperature"]
   if "traffic" in config["experiment"]:
       if config["experiment"]["traffic"]:
           traffic = config["experiment"]["traffic"]
@@ -278,6 +313,9 @@ if __name__ == '__main__':
   if "destiny_path" in config["experiment"]:
       if config["experiment"]["destiny_path"]:
           destiny_path = config["experiment"]["destiny_path"]
+  if "cryomem_path" in config["experiment"]:
+      if config["experiment"]["cryomem_path"]:
+          cryomem_path = config["experiment"]["cryomem_path"]
   if "output_path" in config["experiment"]:
       if config["experiment"]["output_path"]:
           output_path = config["experiment"]["output_path"]
@@ -359,16 +397,19 @@ if __name__ == '__main__':
                               sim_input_cfgs = []
 
                               if len(config["custom_cells"]) == 0: #use default values per technology
-                                this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, {"name":"default", "bits_per_cell":_bits_per_cell})
-                                this_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC_{}stackeddies_{}monolithiclayers_{}.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell, _stacked_die_count, _monolithic_layer_count, "default")
-                                print(this_cfg_path)
-                                sim_input_cfg = set_sim_input_config(simulator, this_cfg_path, process_node, _opt_target, word_width, _capacity, _stacked_die_count, _monolithic_layer_count, this_cell_cfg)
-                                sim_input_cfg.generate_mem_cfg()
-                                #assign paths for default cell
-                                cell_paths.append(this_cell_path)
-                                cell_cfgs.append(this_cell_cfg)
-                                cfg_paths.append(this_cfg_path)
-                                sim_input_cfgs.append(sim_input_cfg)
+                                if (simulator == "cryomem"):
+                                  #TODO
+                                #else:
+                                  this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, {"name":"default", "bits_per_cell":_bits_per_cell})
+                                  this_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC_{}stackeddies_{}monolithiclayers_{}.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell, _stacked_die_count, _monolithic_layer_count, "default")
+                                  print(this_cfg_path)
+                                  sim_input_cfg = set_sim_input_config(simulator, this_cfg_path, process_node, _opt_target, word_width, _capacity, _stacked_die_count, _monolithic_layer_count, this_cell_cfg)
+                                  sim_input_cfg.generate_mem_cfg()
+                                  #assign paths for default cell
+                                  cell_paths.append(this_cell_path)
+                                  cell_cfgs.append(this_cell_cfg)
+                                  cfg_paths.append(this_cfg_path)
+                                  sim_input_cfgs.append(sim_input_cfg)
                                 output_paths.append("{}/sim_output/{}_{}MB_{}_{}BPC_{}stackeddies_{}monolithiclayers_{}b_{}_{}_output.pkl".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _stacked_die_count, _monolithic_layer_count, word_width, "default", simulator))
                                 stdout_logs.append("{}/logs/{}_{}MB_{}_{}BPC_{}stackeddies_{}monolithiclayers_{}_output".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _stacked_die_count, _monolithic_layer_count, "default"))
                                 stderr_logs.append("{}/logs/{}_{}MB_{}_{}BPC_{}stackeddies_{}monolithiclayers_{}_error".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _stacked_die_count, _monolithic_layer_count, "default"))
@@ -410,8 +451,7 @@ if __name__ == '__main__':
 
                           # Run modified nvsim or destiny on cell configs
                           print(simulator)
-                          print(destiny_path)
-                          sim_outputs = run_sim_wrapper(simulator, output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, destiny_path, cfg_paths, sim_input_cfgs, output_dir)
+                          sim_outputs = run_sim_wrapper(simulator, output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, destiny_path, cryomem_path, cfg_paths, sim_input_cfgs, output_dir)
                           
                           #if simulator == "destiny":
                           #    sim_outputs = run_sim("destiny", output_paths, log_dir, stdout_logs, stderr_logs, destiny_path, cfg_paths, sim_input_cfgs, output_dir)
