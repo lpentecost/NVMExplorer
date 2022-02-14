@@ -151,6 +151,9 @@ def parse_cryomem_output(filepath='output_examples/sram_0', input_cfg=CryoMEMInp
   #initialize base
   base = CryoMEMOutputConfig(input_cfg=input_cfg)
 
+  num_banks = 0
+  block_size = 0
+
   with open(filepath, 'r') as f:
     print("File path in parse_cryomem_output")
     print(filepath)
@@ -162,86 +165,28 @@ def parse_cryomem_output(filepath='output_examples/sram_0', input_cfg=CryoMEMInp
   print("here")
 
   for line in lines:
-    print("here1")
-    if 'Data array' in line and (base.area == -1):
-      print("here2")
-      # sloppy fix, skip to end of line
-      print(line)
-      print(line[line.index(":")+1])
-      print(line[line.index(":")+1:])
-
-      if ":" in line[line.index(":")+1:]:
-        line = line[line.index(":")+1:]
-      base.area = float(line[line.index(":")+1:][:-4])
-      if line[-4:] == "um^2":
-        base.area = base.area / (1000.)**2
-    elif '   Read Latency' in line and (base.read_latency == 1):
-      base.read_latency = float(line[line.index(":")+1:][:2])
-      if line[2:] == "us": #scale to ns
-        base.read_latency = base.read_latency * 1000.
-      if line[2:] == "ps": #scale to ns
-        base.read_latency = base.read_latency / 1000.
-      if line[2:] == "ms": #scale to ns (yikes!)
-        base.read_latency = base.read_latency * 1000000.
-    elif '  Area Efficiency =' in line:
-      base.area_efficiency = float(line[line.index(":")+1:][:1])
-    elif '  Read Bandwidth' in line:
-      base.read_bw = float(line[line.index(":")+1:][:4])
-      if line[4:] == "MB/s": #scale to GB/s
-        base.read_bw = base.read_bw / 1024.
-      if line[4:] == "KB/s": #scale to GB/s
-        base.read_bw = base.read_bw / 1024. / 1024.
-    elif '  Write Bandwidth' in line:
-      base.write_bw = float(line[line.index(":")+1:][:4])
-      if line[4:] == "MB/s": #scale to GB/s
-        base.write_bw = base.write_bw / 1024.
-      if line[4:] == "KB/s": #scale to GB/s
-        base.write_bw = base.write_bw / 1024. / 1024.
-    elif '   Read Dynamic Energy ' in line:
-      base.read_energy = float(line[line.index(":")+1:][:2])
-      if line[2:] == "nJ": #scale to pJ
-        base.read_energy = base.read_energy * 1000.
-      if line[2:] == "uJ": #scale to pJ
-        base.read_energy = base.read_energy * 1000. * 1000.
-    elif '  Leakage Power ' in line:
-      base.leakage_power = float(line[line.index(":")+1:][:2])
-      if line[2:] == "uW": #scale to mW
-        base.leakage_power = base.leakage_power / 1000.
-    elif '  Write Latency' in line and (base.write_latency == 1):
-      base.write_latency = float(line[line.index(":")+1:][:2])
-      if line[2:] == "us": #scale to ns
-        base.write_latency = base.write_latency * 1000.
-      if line[2:] == "ps": #scale to ns
-        base.write_latency = base.write_latency / 1000.
-      if line[2:] == "ms": #scale to ns (yikes!)
-        base.write_latency = base.write_latency * 1000000.
-    elif '  Write Dynamic Energy ' in line:
-      base.write_energy = float(line[line.index(":")+1:][:2])
-      if line[2:] == "nJ": #scale to pJ
-        base.write_energy = base.write_energy * 1000.
-      if line[2:] == "uJ": #scale to pJ
-        base.write_energy = base.write_energy * 1000. * 1000.
-
-
-    #separately detect any techspecific quantities
-    if input_cfg.cell_type.mem_cell_type == "SRAM":
-      continue
-    #FIXME set vs. reset for RRAM, support for other cells
-    else:
-      if '  SET Latency' in line:
-        base.write_latency = float(line[line.index(":")+1:][:2])
-        if line[2:] == "us": #scale to ns
-          base.write_latency = base.write_latency * 1000.
-        if line[2:] == "ps": #scale to ns
-          base.write_latency = base.write_latency / 1000.
-        if line[2:] == "ms": #scale to ns (yikes!)
-          base.write_latency = base.write_latency * 1000000.
-      elif '  SET Dynamic Energy ' in line:
-        base.write_energy = float(line[line.index(":")+1:][:2])
-        if line[2:] == "nJ": #scale to pJ
-          base.write_energy = base.write_energy * 1000.
-        if line[2:] == "uJ": #scale to pJ
-          base.write_energy = base.write_energy * 1000. * 1000.
+    if 'Data array: Area (mm2)' in line and (base.area == -1):
+      base.area = float(line.split(": ")[2])
+    elif 'Access time (ns):' in line and (base.read_latency == -1):
+      base.read_latency = float(line.split(":")[1])
+      base.write_latency = float(line.split(":")[1])
+    elif 'Number of banks:' in line:
+      num_banks = float(line.split(":")[1])
+    elif 'Area efficiency (Memory cell area/Total area) -' in line:
+      base.area_efficiency = float((line.split("-")[1]).replace('%', ''))
+    elif 'Block size (bytes):' in line:
+      block_size = float(line.split(":")[1])
+    elif 'Total dynamic read energy per access (nJ):' in line:
+      base.read_energy = float(line.split(":")[1])
+      base.read_energy = base.read_energy * 1000.
+    elif 'Total leakage power of a bank (mW):' in line:
+      base.leakage_power = float(line.split(":")[1])*num_banks
+    elif 'Total dynamic write energy per access (nJ):' in line:
+      base.write_energy = float(line.split(":")[1])
+      base.write_energy = base.write_energy * 1000.
+      
+    base.read_bw = block_size/base.read_latency
+    base.write_bw = block_size/base.write_latency
         
   return base
 
