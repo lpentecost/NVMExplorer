@@ -187,8 +187,6 @@ def run_sim(simulator, output_paths, log_dir, stdout_logs, stderr_logs, sim_path
       sim_output = nvmexplorer_src.input_defs.cryomem_interface.parse_cryomem_output(stdout_logs[i], input_cfg=sim_input_cfgs[i])
     else:
       sim_output = nvmexplorer_src.input_defs.nvsim_interface.parse_nvsim_output(stdout_logs[i], input_cfg=sim_input_cfgs[i])
-    print(stdout_logs[i])
-    sim_output.print_summary()
     if not os.path.exists(output_dir): 
       os.makedirs(output_dir)
     sim_outputs.append(sim_output)
