@@ -2,7 +2,7 @@ import sys
 import os
 
 
-def combine_csv(cell_type, mlc, bg=0):
+def combine_csv(cell_type, mlc, simulator, exp_name, bg=0):
     """ Writes to a file in csv format the combined results from a set of experiments for a certain
     cell type and mlc configuration
 
@@ -12,7 +12,7 @@ def combine_csv(cell_type, mlc, bg=0):
     :type mlc: int
     """
     if (bg == 0):
-      output_file_name = "output/results/{}_{}BPC-combined.csv".format(cell_type, mlc)
+      output_file_name = "output/results/{}_{}BPC_{}-combined-_{}.csv".format(cell_type, mlc, simulator, exp_name)
     else:
       output_file_name = "output/results/FeFET_BG_study.csv"
     
@@ -23,7 +23,7 @@ def combine_csv(cell_type, mlc, bg=0):
     with open(output_file_name, 'a') as big_fp:
       for filename in os.listdir("output/results/"):
           if (bg == 0):
-              if filename.endswith(".csv") and cell_type in filename and "MB" in filename:
+              if filename.endswith(".csv") and cell_type in filename and simulator in filename and exp_name in filename and "MB" in filename:
                   if (mlc == 1): 
                       with open("output/results/" + filename, 'r') as little_fp:
                           big_fp.write(little_fp.read())

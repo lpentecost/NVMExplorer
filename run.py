@@ -294,8 +294,6 @@ if __name__ == '__main__':
   if "cacti_config_file_path" in config["experiment"]:
       if config["experiment"]["cacti_config_file_path"]:
           cacti_config_file_path = config["experiment"]["cacti_config_file_path"]
-          print("here")
-          print(cacti_config_file_path)
   if "output_path" in config["experiment"]:
       if config["experiment"]["output_path"]:
           output_path = config["experiment"]["output_path"]
@@ -335,7 +333,7 @@ if __name__ == '__main__':
                               if not os.path.exists("data/mem_cfgs"): 
                                   os.makedirs("data/mem_cfgs")
 
-                              results_csv = "{}/results/{}_{}MB_{}_{}BPC_{}stackeddies_{}monolithiclayers_{}K-{}.csv".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _stacked_die_count, _monolithic_layer_count, _temperature, exp_name)    
+                              results_csv = "{}/results/{}_{}MB_{}_{}BPC_{}stackeddies_{}monolithiclayers_{}K_{}-{}.csv".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _stacked_die_count, _monolithic_layer_count, _temperature, simulator, exp_name)    
                               if os.path.exists(results_csv):
                                   os.remove(results_csv)
 
@@ -449,5 +447,5 @@ if __name__ == '__main__':
                                           #next, run generic traffic with write buffer proxy
                                           generic_traffic_with_write_buff(access_pattern, sim_input_cfgs, sim_outputs, results_csv, cell_paths, cfg_paths)
       
-      combine_csv(_cell_type, _bits_per_cell)
+      combine_csv(_cell_type, _bits_per_cell, simulator, exp_name)
       print("Reported Results; Evaluation Complete")
