@@ -44,7 +44,6 @@ class SRAMCellConfig(NVSimCellConfig):
 -GlobalWireUseLowSwing: No
 -Routing: non-H-tree
 -InternalSensing: false
--Temperature (K): 350
 -BufferDesignOptimization: balanced
 '''
 		):
@@ -89,7 +88,6 @@ class eDRAMCellConfig(NVSimCellConfig):
 -GlobalWireUseLowSwing: No
 -Routing: non-H-tree
 -InternalSensing: true
--Temperature (K): 350
 -RetentionTime (us): 40
 -BufferDesignOptimization: balanced
 '''

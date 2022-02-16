@@ -408,7 +408,7 @@ def gen_custom_cell(cell_type, custom_cell_inputs):
       cell_cfg.cell_ratio = 1.0
       cell_cfg.generate_cell_file()
       cell_cfg.append_cell_file()
-  elif (cell_type == 'eDRAM'):
+  elif (cell_type == 'eDRAM' or cell_type == '3teDRAM'):
       #Base eDRAM cell
       cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.eDRAMCellConfig(
           cell_area_F2 = 60,

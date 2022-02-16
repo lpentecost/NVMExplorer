@@ -16,6 +16,8 @@ class CryoMEMInputConfig:
         global_tsv_projection=0,
         tsv_redundancy=1.0,
         monolithic_layer_count=1,
+        temperature=300,
+        cacti_config_file_path="",
         allow_difference_tag_tech=1,
         memory_cell_input_file="",
         print_all_optimals=0,
@@ -37,6 +39,8 @@ class CryoMEMInputConfig:
     self.global_tsv_projection = global_tsv_projection
     self.tsv_redundancy = tsv_redundancy
     self.monolithic_layer_count = monolithic_layer_count
+    self.temperature = temperature
+    self.cacti_config_file_path = cacti_config_file_path
     self.allow_difference_tag_tech = allow_difference_tag_tech
     self.memory_cell_input_file = memory_cell_input_file
     self.print_all_optimals = print_all_optimals
@@ -53,6 +57,8 @@ class CryoMEMInputConfig:
     cfg_file = open(self.mem_cfg_file_path, "w+")
     cfg_file.write(self.cell_type.mem_cfg_base)
     cfg_file.write("-ProcessNode: %d\n" % self.process_node+"\n")
+    cfg_file.write("-Temperature (K): %d\n" % self.temperature+"\n")
+    cfg_file.write("-CactiConfigFilePath: "+self.cacti_config_file_path+"\n")
     cfg_file.write("-OptimizationTarget: "+self.opt_target+"\n")
     cfg_file.write("-WordWidth (bit): %d\n" % self.word_width+"\n")
     cfg_file.write("-Capacity (MB): %d\n" % self.capacity+"\n") 
@@ -155,14 +161,11 @@ def parse_cryomem_output(filepath='output_examples/sram_0', input_cfg=CryoMEMInp
   block_size = 0
 
   with open(filepath, 'r') as f:
-    print("File path in parse_cryomem_output")
-    print(filepath)
     lines = f.readlines()
 
   
   # Get rid of new lines
   lines = map(lambda x: x.rstrip(), lines)
-  print("here")
 
   for line in lines:
     if 'Data array: Area (mm2)' in line and (base.area == -1):
