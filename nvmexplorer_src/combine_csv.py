@@ -47,6 +47,6 @@ def combine_csv(cell_type, mlc, simulator, exp_name, bg=0):
               big_fp.write(line)
               first = 1
           elif first == 1:
-              if 'MemCellType' not in line:
+              if 'MemCellType' not in line and 'size (bytes)' not in line:
                   big_fp.write(line)
     
