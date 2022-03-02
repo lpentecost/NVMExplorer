@@ -4,100 +4,107 @@ from nvmexplorer_src.input_defs.cell_cfgs import *
 
 class CryoMEMInputConfig:
   def __init__(self,
-                mem_cfg_file_path="../../data/mem_cfgs/test_SRAM.cfg", #path to cryomem cfg input
+                mem_cfg_file_path="../../data/mem_cfgs/cache-sram.cfg", #path to cryomem cfg input
+                capacity=8,
+                word_width=64,
+		cell_type=CryoMEMSRAMCellConfig(), #pass the cell configuration
 		process_node=45, #chosen node in nm
-		opt_target="ReadLatency", #optimization target
-		word_width=64, #word width in bits
-		capacity=4, #capacity in MB
-		cell_type=SRAMCellConfig(), #pass the cell configuration
-        stacked_die_count=1,
-        partition_granularity=0,
-        local_tsv_projection=0,
-        global_tsv_projection=0,
-        tsv_redundancy=1.0,
-        monolithic_layer_count=1,
-        temperature=300,
-        cacti_config_file_path="",
-        allow_difference_tag_tech=1,
-        memory_cell_input_file="",
-        print_all_optimals=0,
-        force_bank_3d="",
-        force_bank_3da="",
-        force_bank_a="",
-        print_level=0
-
+                temperature=350,
+                banks=128,
 		):
     self.mem_cfg_file_path = mem_cfg_file_path
-    self.process_node = process_node
-    self.opt_target = opt_target
-    self.word_width = word_width
     self.capacity = capacity
+    self.word_width = word_width
     self.cell_type = cell_type
-    self.stacked_die_count = stacked_die_count
-    self.partition_granularity = partition_granularity
-    self.local_tsv_projection = local_tsv_projection
-    self.global_tsv_projection = global_tsv_projection
-    self.tsv_redundancy = tsv_redundancy
-    self.monolithic_layer_count = monolithic_layer_count
+    self.process_node = process_node
     self.temperature = temperature
-    self.cacti_config_file_path = cacti_config_file_path
-    self.allow_difference_tag_tech = allow_difference_tag_tech
-    self.memory_cell_input_file = memory_cell_input_file
-    self.print_all_optimals = print_all_optimals
-    self.force_bank_3d = force_bank_3d
-    self.force_bank_3da = force_bank_3da
-    self.force_bank_a = force_bank_a
-    self.print_level = print_level
+    self.banks = banks
 
 
   def generate_mem_cfg(self):
     """ Creates a memory config file using characteristics of :class:`CryoMEMInputConfig` object 
     to be used as an input to CryoMEM
     """
+    self.word_width = self.word_width/8
+    self.process_node = self.process_node/1000
+    self.capacity = self.capacity*1024*1024
     cfg_file = open(self.mem_cfg_file_path, "w+")
+    cfg_file.write('-size (bytes) %d\n' % self.capacity+'\n')
+    cfg_file.write('-Array Power Gating - "false"\n')
+    cfg_file.write('-WL Power Gating - "false"\n')
+    cfg_file.write('-CL Power Gating - "false"\n')
+    cfg_file.write('-Bitline floating - "false"\n')
+    cfg_file.write('-Interconnect Power Gating - "false"\n')
+    cfg_file.write('-Power Gating Performance Loss 0.01\n')
+    cfg_file.write('-block size (bytes) %d\n' % self.word_width)
+    cfg_file.write('-associativity 8\n')
+    cfg_file.write('-read-write port 2\n')
+    cfg_file.write('-exclusive read port 0\n')
+    cfg_file.write('-exclusive write port 0\n')
+    cfg_file.write('-single ended read ports 0\n')
+    cfg_file.write('-UCA bank count 128\n')
+    cfg_file.write('-technology (u) %f\n' % self.process_node+'\n')
+    cfg_file.write('-page size (bits) 8192\n')
+    cfg_file.write('-burst length 8\n')
+    cfg_file.write('-internal prefetch width 8\n')
+    cfg_file.write('-Data array cell type - "itrs-hp"\n')
+    cfg_file.write('-Data array peripheral type - "itrs-hp"\n')
+    cfg_file.write('-Tag array cell type - "itrs-hp"\n')
+    cfg_file.write('-Tag array peripheral type - "itrs-hp"\n')
+    cfg_file.write('-output/input bus width 64\n')
+    cfg_file.write('-operating temperature (K) 360\n')
+    cfg_file.write('-cache type "ram"\n')
+    cfg_file.write('-tag size (b) "default"\n')
+    cfg_file.write('-access mode (normal, sequential, fast) - "normal"\n')
+    cfg_file.write('-design objective (weight delay, dynamic power, leakage power, cycle time, area) 100:0:0:100:0\n')
+    cfg_file.write('-deviate (delay, dynamic power, leakage power, cycle time, area) 0:100:100:0:100\n')
+    cfg_file.write('-NUCAdesign objective (weight delay, dynamic power, leakage power, cycle time, area) 100:100:0:0:100\n')
+    cfg_file.write('-NUCAdeviate (delay, dynamic power, leakage power, cycle time, area) 10:10000:10000:10000:10000\n')
+    cfg_file.write('-Optimize ED or ED^2 (ED, ED^2, NONE): "ED^2"\n')
+    cfg_file.write('-Cache model (NUCA, UCA)  - "UCA"\n')
+    cfg_file.write('-NUCA bank count 0\n')
+    cfg_file.write('-Wire signaling (fullswing, lowswing, default) - "Global_30"\n')
+    cfg_file.write('-Wire inside mat - "semi-global"\n')
+    cfg_file.write('-Wire outside mat - "semi-global"\n')
+    cfg_file.write('-Interconnect projection - "conservative"\n')
+    cfg_file.write('-Core count 8\n')
+    cfg_file.write('-Cache level (L2/L3) - "L3"\n')
+    cfg_file.write('-Add ECC - "true"\n')
+    cfg_file.write('-Print level (DETAILED, CONCISE) - "DETAILED"\n')
+    cfg_file.write('-Print input parameters - "true"\n')
+    cfg_file.write('-Force cache config - "false"\n')
+    cfg_file.write('-Ndwl 1\n')
+    cfg_file.write('-Ndbl 1\n')
+    cfg_file.write('-Nspd 0\n')
+    cfg_file.write('-Ndcm 1\n')
+    cfg_file.write('-Ndsaml1 0\n')
+    cfg_file.write('-Ndsam2 0\n')
+    cfg_file.write('-dram_type "DDR3"\n')
+    cfg_file.write('-io state "WRITE"\n')
+    cfg_file.write('-addr_timing 1.0\n') 
+    cfg_file.write('-mem_density 4 Gb\n')
+    cfg_file.write('-bus_freq 800 MHz\n')
+    cfg_file.write('-duty_cycle 1.0\n')
+    cfg_file.write('-activity_dq 1.0\n')
+    cfg_file.write('-activity_ca 0.5\n')
+    cfg_file.write('-num_dq 72\n')
+    cfg_file.write('-num_dqs 18\n')
+    cfg_file.write('-num_ca 25\n')
+    cfg_file.write('-num_clk  2\n')
+    cfg_file.write('-num_mem_dq 2\n')
+    cfg_file.write('-mem_data_width 8\n')
+    cfg_file.write('-rtt_value 10000\n')
+    cfg_file.write('-ron_value 34\n')
+    cfg_file.write('-tflight_value\n')
+    cfg_file.write('-num_bobs 1\n')
+    cfg_file.write('-capacity 80\n')
+    cfg_file.write('-num_channels_per_bob 1\n')
+    cfg_file.write('-first metric "Cost"\n')
+    cfg_file.write('-second metric "Bandwidth"\n')
+    cfg_file.write('-third metric "Energy"\n')
+    cfg_file.write('-DIMM model "ALL"\n')
+    cfg_file.write('-mirror_in_bob "F"\n')
     cfg_file.write(self.cell_type.mem_cfg_base)
-    cfg_file.write("-ProcessNode: %d\n" % self.process_node+"\n")
-    cfg_file.write("-Temperature (K): %d\n" % self.temperature+"\n")
-    cfg_file.write("-CactiConfigFilePath: "+self.cacti_config_file_path+"\n")
-    cfg_file.write("-OptimizationTarget: "+self.opt_target+"\n")
-    cfg_file.write("-WordWidth (bit): %d\n" % self.word_width+"\n")
-    cfg_file.write("-Capacity (MB): %d\n" % self.capacity+"\n") 
-    cfg_file.write("-StackedDieCount: %d\n" % self.stacked_die_count+"\n") #- Number of dies over which the memory is distributed
-    cfg_file.write("-PartitionGranularity: %d\n" % self.partition_granularity+"\n")  
-    #0: Coarse granularity: This assumes that address, control, and data signals are 
-    #broadcast to all stacked dies and decoded on the destination die. 
-    #1: Fine granularity: This assumes that address signals are pre-decoded on a 
-    #separate logic layer and the undecoded address signals are broadcast to all 
-    #stacked dies. The control and data are still shared. 
-    #Note that the total number of dies in fine granularity is StackedDieCount + 1
-    cfg_file.write("-LocalTSVProjection: %d\n" % self.local_tsv_projection+"\n")  
-    #0: Use aggressive TSV projection from ITRS for local TSVs.
-    #1: Use conservative values from industry measurements for local TSVs
-    #Local TSVs are used in fine granularity partitioning to route pre-decoded signals
-    cfg_file.write("-GlobalTSVProjection: %d\n" % self.global_tsv_projection+"\n") 
-    #0: Use aggressive TSV projection from ITRS for global TSVs
-    #1: Use conservative values from industry measurements for global TSVs
-    #Global TSVs are used in both fine and coarse granularity partitioning to 
-    #route broadcast signals (e.g., data and control signals)
-    cfg_file.write("-TSVRedundancy: %f\n" % self.tsv_redundancy+"\n") #Any floating point value from 1.0 or higher (reasonably, about 
-    #2.0 is the maximum). ((TSVRedundancy - 1)*100) is the percentage of extra TSVs 
-    #assumed for each TSV cluster for fault tolerance / TSV yield issues.
-    cfg_file.write("-MonolithicStackCount: %d\n" % self.monolithic_layer_count+"\n") #Integer value e.g., 1, 2, 4. This is the number of memory 
-    #layers on the *same* die which are monolithically stacked.
-    #cfg_file.write("-AllowDifferenceTagTech: %d\n" % self.allow_difference_tag_tech+"\n") #Allow the tag array of a cache to be a different 
-    #technology than the data array (e.g., SRAM tag array with STT-RAM data array).
-    #cfg_file.write("-MemoryCellInputFile: ".format(self.memory_cell_input_file)+"\n") #This parameter can be specified multiple times 
-    #to consider multiple different technologies in the same simulation run.
-    #cfg_file.write("-PrintAllOptimals: %d\n" % self.print_all_optimals+"\n") #Print the optimal design for each optimization 
-    #target (can be used to find the best of multiple technology inputs).
-    #cfg_file.write("-ForceBank3D: ".format(self.force_bank_3d)+"\n") #Dimensions of each bank in terms of number of Mats in each direction.
-    #cfg_file.write("-ForceBank3DA: ".format(self.force_bank_3da)+"\n") #Same as ForceBank3D, except forcing the number of active Mats is not required
-    #cfg_file.write("-ForceBankA: ".format(self.force_bank_a)+"\n") #Same as ForceBank in NVSim, except forcing the number of active Mats is not required.
-    cfg_file.write("-PrintLevel: %d\n" % self.print_level+"\n") #0 -> does NOT produce CACHE DATA ARRAY DETAILS and CACHE TAG ARRAY DETAILS
-    #1 -> produces CACHE DATA ARRAY DETAILS and CACHE TAG ARRAY DETAILS 
-    if self.cell_type.mlc > 1:
-      cell_levels = 2**(self.cell_type.mlc)
-      cfg_file.write("-CellLevels: %d\n" % cell_levels+"\n")
     cfg_file.close()
 
 class CryoMEMOutputConfig: #initialized to 16nm SRAM, 4MB

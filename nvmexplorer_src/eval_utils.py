@@ -6,18 +6,37 @@ import fileinput
 #from oauth2client.service_account import ServiceAccountCredentials
 import csv
 
+def parse_cryomem_input_file(file_path): # helper function to parse cell cfgs and mem cfgs
+  headers = []
+  vals = []
+  if file_path != "":
+    with open(file_path) as fp:
+      line = fp.readline()
+      while ' ' in line:
+          print(line.rpartition(' '))
+          header=line.rpartition(' ')[0]
+          header=header.replace('-','')
+          print('header: '+header)
+          val=line.rpartition(' ')[2]
+          print('val: '+val)
+          headers.append(header.rstrip())
+          vals.append(val.rstrip())
+          line = fp.readline()
+  return headers, vals
+
 def parse_nvsim_input_file(file_path): # helper function to parse cell cfgs and mem cfgs
   headers = []
   vals = []
-  with open(file_path) as fp:
-    line = fp.readline()
-    while ':' in line:
-        header=line.split(':')[0]
-        header=header.replace('-','')
-        val=line.split(':')[1]
-        headers.append(header.rstrip())
-        vals.append(val.rstrip())
-        line = fp.readline()
+  if file_path != "":
+    with open(file_path) as fp:
+      line = fp.readline()
+      while ':' in line:
+          header=line.split(':')[0]
+          header=header.replace('-','')
+          val=line.split(':')[1]
+          headers.append(header.rstrip())
+          vals.append(val.rstrip())
+          line = fp.readline()
   return headers, vals
 
 class ExperimentResult:
@@ -92,7 +111,7 @@ class ExperimentResult:
     print(self.write_bw_utilization, end = "\t")
     print()
 
-  def report_header_benchmark(self, to_csv, csv_file_path, cell_cfg_path, mem_cfg_path): #FIXME report all results
+  def report_header_benchmark(self, to_csv, csv_file_path, cell_cfg_path, mem_cfg_path, simulator): #FIXME report all results
     #FIXME: make extra parameters as kwargs
     
     # Remove empty lines from cfg file to make processing easier
@@ -100,8 +119,12 @@ class ExperimentResult:
         if line.rstrip():
             print(line, end="")
 
-    cell_headers, cell_vals = parse_nvsim_input_file(cell_cfg_path)
-    mem_headers, mem_vals = parse_nvsim_input_file(mem_cfg_path)
+    if simulator == 'cryomem':
+        cell_headers, cell_vals = parse_cryomem_input_file(cell_cfg_path)
+        mem_headers, mem_vals = parse_cryomem_input_file(mem_cfg_path)
+    else:
+        cell_headers, cell_vals = parse_nvsim_input_file(cell_cfg_path)
+        mem_headers, mem_vals = parse_nvsim_input_file(mem_cfg_path)
 
     row_to_insert = ["Benchmark Name", "Read Accesses", "Write Accesses", "Total Dynamic Read Power (mW)", "Total Dynamic Write Power (mW)", "Total Power", "Total Dynamic Read Energy (mJ)", "Total Dynamic Write Energy (mJ)", "Total Read Latency (ms)", "Total Write Latency (ms)", "Read BW Util", "Write BW Util", "Area (mm^2)", "Area Efficiency (percent)", "Read Latency (ns)", "Write Latency (ns)", "Read Energy (pJ)", "Write Energy (pJ)", "Leakage Power (mW)", "Bits Per Cell"]
     
@@ -114,7 +137,7 @@ class ExperimentResult:
       wr = csv.writer(fp, dialect='excel')
       wr.writerow(row_to_insert)
 
-  def report_result_benchmark(self, to_csv, csv_file_path, cell_cfg_path, mem_cfg_path, access_pattern):
+  def report_result_benchmark(self, to_csv, csv_file_path, cell_cfg_path, mem_cfg_path, access_pattern, simulator):
     #FIXME: make extra parameters as kwargs
     
     # Remove empty lines from cfg file to make processing easier
@@ -122,8 +145,12 @@ class ExperimentResult:
         if line.rstrip():
             print(line, end="")
 
-    cell_headers, cell_vals = parse_nvsim_input_file(cell_cfg_path)
-    mem_headers, mem_vals = parse_nvsim_input_file(mem_cfg_path)
+    if simulator == 'cryomem':
+        cell_headers, cell_vals = parse_cryomem_input_file(cell_cfg_path)
+        mem_headers, mem_vals = parse_cryomem_input_file(mem_cfg_path)
+    else:
+        cell_headers, cell_vals = parse_nvsim_input_file(cell_cfg_path)
+        mem_headers, mem_vals = parse_nvsim_input_file(mem_cfg_path)
 
     if "1BPC" in csv_file_path:
       bits_per_cell = 1

@@ -4,7 +4,7 @@ from data.workload_data.dnn_inputs import *
 from nvmexplorer_src.eval_utils import *
 
 
-def generic_traffic(access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths):
+def generic_traffic(access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths, simulator):
   """  Evaluates and writes results for scenarios from apre-set, generic traffic sweep
 
   :param access_pattern: :class:`AccessPattern` object
@@ -27,10 +27,10 @@ def generic_traffic(access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv
           this_result = ExperimentResult(access_pattern, nvsim_input_cfgs[i], nvsim_outputs[i])
           this_result.evaluate()
           # These print to csv
-          this_result.report_result_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], access_pattern)
+          this_result.report_result_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], access_pattern, simulator)
 
 
-def graph_traffic(graph8MB, access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths):
+def graph_traffic(graph8MB, access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths, simulator):
   """  Evaluates and writes results for scenarios from a graph application traffic sweep
 
   :param access_pattern: :class:`AccessPattern` object
@@ -53,10 +53,10 @@ def graph_traffic(graph8MB, access_pattern, nvsim_input_cfgs, nvsim_outputs, res
             this_result = ExperimentResult(access_pattern, nvsim_input_cfgs[i], nvsim_outputs[i])
             this_result.evaluate()
             # These print to csv
-            this_result.report_result_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], access_pattern)
+            this_result.report_result_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], access_pattern, simulator)
   
 
-def dnn_traffic(DNN_weights, DNN_weights_acts, access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths):
+def dnn_traffic(DNN_weights, DNN_weights_acts, access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths, simulator):
   """  Evaluates and writes results for scenarios from a dnn application traffic sweep
 
   :param access_pattern: :class:`AccessPattern` object
@@ -81,10 +81,10 @@ def dnn_traffic(DNN_weights, DNN_weights_acts, access_pattern, nvsim_input_cfgs,
             this_result = ExperimentResult(access_pattern, nvsim_input_cfgs[i], nvsim_outputs[i])
             this_result.evaluate()
             # These print to csv
-            this_result.report_result_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], access_pattern)
+            this_result.report_result_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], access_pattern, simulator)
 
 
-def spec_traffic(spec8MBLLC, spec16MBLLC, spec16MBDRAM, spec16MBL2, spec32MBLLC, spec64MBLLC, access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths):
+def spec_traffic(spec8MBLLC, spec16MBLLC, spec16MBDRAM, spec16MBL2, spec32MBLLC, spec64MBLLC, access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths, simulator):
   """  Evaluates and writes results for scenarios from SPEC2017 Cache Profiling traffic sweep
 
   :param access_pattern: :class:`AccessPattern` object
@@ -108,9 +108,9 @@ def spec_traffic(spec8MBLLC, spec16MBLLC, spec16MBDRAM, spec16MBL2, spec32MBLLC,
             this_result = ExperimentResult(access_pattern, nvsim_input_cfgs[i], nvsim_outputs[i])
             this_result.evaluate()
             # These print to csv
-            this_result.report_result_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], access_pattern)
+            this_result.report_result_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], access_pattern, simulator)
 
-def generic_traffic_with_write_buff(access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths):
+def generic_traffic_with_write_buff(access_pattern, nvsim_input_cfgs, nvsim_outputs, results_csv, cell_paths, cfg_paths, simulator):
   """  Evaluates and writes results for pre-defined case study scenarios from a generic application traffic sweep with write buffering that is evaluated
 
   :param access_pattern: :class:`AccessPattern` object
@@ -144,7 +144,7 @@ def generic_traffic_with_write_buff(access_pattern, nvsim_input_cfgs, nvsim_outp
         this_result = ExperimentResult(access_pattern, nvsim_input_cfgs[i], nvsim_outputs[i])
         this_result.evaluate()
         # These print to csv
-        this_result.report_result_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], access_pattern)
+        this_result.report_result_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], access_pattern, simulator)
         #graph example start
         access_pattern.write_freq = wr_base_graph * pct_traffic
         access_pattern.read_freq = rd_base_graph
@@ -152,7 +152,7 @@ def generic_traffic_with_write_buff(access_pattern, nvsim_input_cfgs, nvsim_outp
         this_result = ExperimentResult(access_pattern, nvsim_input_cfgs[i], nvsim_outputs[i])
         this_result.evaluate()
         # These print to csv
-        this_result.report_result_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], access_pattern)
+        this_result.report_result_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], access_pattern, simulator)
         #reset write latency
         nvsim_outputs[i].write_latency = temp_write_latency
 

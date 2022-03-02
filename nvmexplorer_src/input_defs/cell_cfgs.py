@@ -470,6 +470,28 @@ class FeFETCellConfig(NVSimCellConfig):
 
     cell_file.close()
 
+class CryoMEMCellConfig:
+  def __init__(self,
+		mem_cell_type="SRAM", #name of cell
+		):
+
+    self.mem_cell_type = mem_cell_type
+
+class CryoMEMSRAMCellConfig(CryoMEMCellConfig):
+  def __init__(self,
+    		mem_cfg_base = ''
+		):
+    self.mem_cfg_base = "\n" #customize base string for each technology
+
+class CryoMEMeDRAMCellConfig(NVSimCellConfig):
+  def __init__(self,
+    		mem_cfg_base = '''
+-3T-eDRAM
+'''
+		):
+    self.mem_cfg_base = mem_cfg_base + "\n" #customize base string for each technology
+
+
 if __name__ == '__main__':
   #test cell def generation
   test_default_cell = NVSimCellConfig()

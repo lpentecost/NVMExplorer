@@ -184,7 +184,7 @@ def form_tentpoles(data_df, cell_type, bits_per_cell):
 
 
 ## Generate cell configuration from user input
-def gen_custom_cell(cell_type, custom_cell_inputs):
+def gen_custom_cell(cell_type, custom_cell_inputs, simulator):
   """ Generates NVSim cell files for a specified cell type and input characteristics
 
   :param cell_type: String specifying which NVM technology to use
@@ -192,242 +192,253 @@ def gen_custom_cell(cell_type, custom_cell_inputs):
   :param custom_cell_inputs: dictionary object specifying possible input params to cell def
   :return: path to NVSim cell file and :class:`NVSimInputConfig` object containing NVSim input cfgs 
   """
+
+  if (simulator == 'cryomem'):
+      cell_path = ""
   
-  ## Form cell cfgs and mem cfgs for best-case and worst-case default technologies
-  cell_path = "data/cell_cfgs/{}_{}.cell".format(cell_type, custom_cell_inputs["name"])
- 
-  # depending on cell type, initialize default cell, then over-write params as provided, then generate cell file
- 
-  if (cell_type == 'STT'):
-      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.STTRAMCellConfig(
-          cell_file_path=cell_path,
-         )
+      if (cell_type == 'eDRAM' or cell_type == '3teDRAM'):
+          #Base CryoMEM eDRAM cell
+          cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.CryoMEMeDRAMCellConfig()
 
-      # depending on exposed parameters per technology, check and assign input values
-      if "cell_size_F2" in custom_cell_inputs:
-          cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
-      if "access_CMOS_width" in custom_cell_inputs:
-          cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
-      if "r_on" in custom_cell_inputs:
-          cell_cfg.r_on = custom_cell_inputs["r_on"]  
-      if "r_off" in custom_cell_inputs:
-          cell_cfg.r_off = custom_cell_inputs["r_off"]  
-      if "read_mode" in custom_cell_inputs:
-          cell_cfg.read_mode = custom_cell_inputs["read_mode"]  
-      if "read_voltage" in custom_cell_inputs:
-          cell_cfg.read_voltage = custom_cell_inputs["read_voltage"]  
-      if "min_sense_voltage" in custom_cell_inputs:
-          cell_cfg.min_sense_voltage = custom_cell_inputs["min_sense_voltage"]  
-      if "read_power" in custom_cell_inputs:
-          cell_cfg.read_power = custom_cell_inputs["read_power"]  
-      if "reset_mode" in custom_cell_inputs:
-          cell_cfg.reset_mode = custom_cell_inputs["reset_mode"]  
-      if "reset_current" in custom_cell_inputs:
-          cell_cfg.reset_current = custom_cell_inputs["reset_current"]  
-      if "reset_pulse" in custom_cell_inputs:
-          cell_cfg.reset_pulse = custom_cell_inputs["reset_pulse"]  
-      if "reset_energy" in custom_cell_inputs:
-          cell_cfg.reset_energy = custom_cell_inputs["reset_energy"]  
-      if "set_mode" in custom_cell_inputs:
-          cell_cfg.set_mode = custom_cell_inputs["set_mode"]  
-      if "set_current" in custom_cell_inputs:
-          cell_cfg.set_current = custom_cell_inputs["set_current"]  
-      if "set_pulse" in custom_cell_inputs:
-          cell_cfg.set_pulse = custom_cell_inputs["set_pulse"]  
-      if "set_energy" in custom_cell_inputs:
-          cell_cfg.set_energy = custom_cell_inputs["set_energy"]  
-      if "mlc" in custom_cell_inputs:
-          cell_cfg.mlc = custom_cell_inputs["mlc"]  
-      if "read_floating" in custom_cell_inputs:
-          cell_cfg.read_floating = custom_cell_inputs["read_floating"]  
-
-      cell_cfg.generate_cell_file()
-      cell_cfg.append_cell_file()
-  
-  elif (cell_type == 'PCM'):
-      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.PCMCellConfig(
-          cell_file_path=cell_path,
-         )
-
-      # depending on exposed parameters per technology, check and assign input values
-      if "cell_size_F2" in custom_cell_inputs:
-          cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
-      if "access_CMOS_width" in custom_cell_inputs:
-          cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
-      if "r_on" in custom_cell_inputs:
-          cell_cfg.r_on = custom_cell_inputs["r_on"]  
-      if "r_off" in custom_cell_inputs:
-          cell_cfg.r_off = custom_cell_inputs["r_off"]  
-      if "read_mode" in custom_cell_inputs:
-          cell_cfg.read_mode = custom_cell_inputs["read_mode"]  
-      if "read_voltage" in custom_cell_inputs:
-          cell_cfg.read_voltage = custom_cell_inputs["read_voltage"]  
-      if "read_current" in custom_cell_inputs:
-          cell_cfg.read_current = custom_cell_inputs["read_current"]  
-      if "read_energy" in custom_cell_inputs:
-          cell_cfg.read_energy = custom_cell_inputs["read_energy"]  
-      if "reset_mode" in custom_cell_inputs:
-          cell_cfg.reset_mode = custom_cell_inputs["reset_mode"]  
-      if "reset_current" in custom_cell_inputs:
-          cell_cfg.reset_current = custom_cell_inputs["reset_current"]  
-      if "reset_pulse" in custom_cell_inputs:
-          cell_cfg.reset_pulse = custom_cell_inputs["reset_pulse"]  
-      if "set_mode" in custom_cell_inputs:
-          cell_cfg.set_mode = custom_cell_inputs["set_mode"]  
-      if "set_current" in custom_cell_inputs:
-          cell_cfg.set_current = custom_cell_inputs["set_current"]  
-      if "set_pulse" in custom_cell_inputs:
-          cell_cfg.set_pulse = custom_cell_inputs["set_pulse"]  
-      if "mlc" in custom_cell_inputs:
-          cell_cfg.mlc = custom_cell_inputs["mlc"]  
-      
-      cell_cfg.generate_cell_file()
-      cell_cfg.append_cell_file()
-  
-  elif (cell_type == 'CTT'): #FIXME fill in with details
-      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.CTTCellConfig()
-
-      # depending on exposed parameters per technology, check and assign input values
-      if "cell_size_F2" in custom_cell_inputs:
-          cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
-
- 
-  elif (cell_type == 'RRAM'):
-      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.RRAMCellConfig(
-          cell_file_path=cell_path
-         )
-
-      # depending on exposed parameters per technology, check and assign input values
-      if "cell_size_F2" in custom_cell_inputs:
-          cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
-      if "access_CMOS_width" in custom_cell_inputs:
-          cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
-      if "r_on_set_v" in custom_cell_inputs:
-          cell_cfg.r_on_set_v = custom_cell_inputs["r_on_set_v"]
-      if "r_off_set_v" in custom_cell_inputs:
-          cell_cfg.r_off_set_v = custom_cell_inputs["r_off_set_v"]
-      if "r_on_reset_v" in custom_cell_inputs:
-          cell_cfg.r_on_reset_v = custom_cell_inputs["r_on_reset_v"]
-      if "r_off_reset_v" in custom_cell_inputs:
-          cell_cfg.r_off_reset_v = custom_cell_inputs["r_off_reset_v"]
-      if "r_on_read_v" in custom_cell_inputs:
-          cell_cfg.r_on_read_v = custom_cell_inputs["r_on_read_v"]
-      if "r_off_read_v" in custom_cell_inputs:
-          cell_cfg.r_off_read_v = custom_cell_inputs["r_off_read_v"]
-      if "r_on_half_reset" in custom_cell_inputs:
-          cell_cfg.r_on_half_reset = custom_cell_inputs["r_on_half_reset"]
-      if "cap_on" in custom_cell_inputs:
-          cell_cfg.cap_on = custom_cell_inputs["cap_on"]
-      if "cap_off" in custom_cell_inputs:
-          cell_cfg.cap_off = custom_cell_inputs["cap_off"]
-      if "read_mode" in custom_cell_inputs:
-          cell_cfg.read_mode = custom_cell_inputs["read_mode"]  
-      if "read_voltage" in custom_cell_inputs:
-          cell_cfg.read_voltage = custom_cell_inputs["read_voltage"]  
-      if "read_power" in custom_cell_inputs:
-          cell_cfg.read_power = custom_cell_inputs["read_power"]  
-      if "reset_mode" in custom_cell_inputs:
-          cell_cfg.reset_mode = custom_cell_inputs["reset_mode"]  
-      if "reset_voltage" in custom_cell_inputs:
-          cell_cfg.reset_voltage = custom_cell_inputs["reset_voltage"]  
-      if "reset_pulse" in custom_cell_inputs:
-          cell_cfg.reset_pulse = custom_cell_inputs["reset_pulse"]  
-      if "reset_energy" in custom_cell_inputs:
-          cell_cfg.reset_energy = custom_cell_inputs["reset_energy"]  
-      if "set_mode" in custom_cell_inputs:
-          cell_cfg.set_mode = custom_cell_inputs["set_mode"]  
-      if "set_voltage" in custom_cell_inputs:
-          cell_cfg.set_voltage = custom_cell_inputs["set_voltage"]  
-      if "set_pulse" in custom_cell_inputs:
-          cell_cfg.set_pulse = custom_cell_inputs["set_pulse"]  
-      if "set_energy" in custom_cell_inputs:
-          cell_cfg.set_energy = custom_cell_inputs["set_energy"]  
-      if "mlc" in custom_cell_inputs:
-          cell_cfg.mlc = custom_cell_inputs["mlc"]  
-      if "read_floating" in custom_cell_inputs:
-          cell_cfg.read_floating = custom_cell_inputs["read_floating"]  
-      
-      cell_cfg.generate_cell_file()
-      cell_cfg.append_cell_file()
-
-  elif (cell_type == 'FeFET'):
-      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.FeFETCellConfig(
-          cell_file_path=cell_path
-         )
-
-      # depending on exposed parameters per technology, check and assign input values
-      if "cell_size_F2" in custom_cell_inputs:
-          cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
-      if "access_CMOS_width" in custom_cell_inputs:
-          cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
-      if "access_Vdrop" in custom_cell_inputs:
-          cell_cfg.access_Vdrop = custom_cell_inputs["access_Vdrop"]
-      if "r_on_set_v" in custom_cell_inputs:
-          cell_cfg.r_on_set_v = custom_cell_inputs["r_on_set_v"]
-      if "r_off_set_v" in custom_cell_inputs:
-          cell_cfg.r_off_set_v = custom_cell_inputs["r_off_set_v"]
-      if "r_on_reset_v" in custom_cell_inputs:
-          cell_cfg.r_on_reset_v = custom_cell_inputs["r_on_reset_v"]
-      if "r_off_reset_v" in custom_cell_inputs:
-          cell_cfg.r_off_reset_v = custom_cell_inputs["r_off_reset_v"]
-      if "r_on_read_v" in custom_cell_inputs:
-          cell_cfg.r_on_read_v = custom_cell_inputs["r_on_read_v"]
-      if "r_off_read_v" in custom_cell_inputs:
-          cell_cfg.r_off_read_v = custom_cell_inputs["r_off_read_v"]
-      if "r_on_half_reset" in custom_cell_inputs:
-          cell_cfg.r_on_half_reset = custom_cell_inputs["r_on_half_reset"]
-      if "cap_on" in custom_cell_inputs:
-          cell_cfg.cap_on = custom_cell_inputs["cap_on"]
-      if "cap_off" in custom_cell_inputs:
-          cell_cfg.cap_off = custom_cell_inputs["cap_off"]
-      if "read_mode" in custom_cell_inputs:
-          cell_cfg.read_mode = custom_cell_inputs["read_mode"]  
-      if "read_voltage" in custom_cell_inputs:
-          cell_cfg.read_voltage = custom_cell_inputs["read_voltage"]  
-      if "read_power" in custom_cell_inputs:
-          cell_cfg.read_power = custom_cell_inputs["read_power"]  
-      if "reset_mode" in custom_cell_inputs:
-          cell_cfg.reset_mode = custom_cell_inputs["reset_mode"]  
-      if "reset_voltage" in custom_cell_inputs:
-          cell_cfg.reset_voltage = custom_cell_inputs["reset_voltage"]  
-      if "reset_pulse" in custom_cell_inputs:
-          cell_cfg.reset_pulse = custom_cell_inputs["reset_pulse"]  
-      if "reset_energy" in custom_cell_inputs:
-          cell_cfg.reset_energy = custom_cell_inputs["reset_energy"]  
-      if "set_mode" in custom_cell_inputs:
-          cell_cfg.set_mode = custom_cell_inputs["set_mode"]  
-      if "set_voltage" in custom_cell_inputs:
-          cell_cfg.set_voltage = custom_cell_inputs["set_voltage"]  
-      if "set_pulse" in custom_cell_inputs:
-          cell_cfg.set_pulse = custom_cell_inputs["set_pulse"]  
-      if "set_energy" in custom_cell_inputs:
-          cell_cfg.set_energy = custom_cell_inputs["set_energy"]  
-      if "mlc" in custom_cell_inputs:
-          cell_cfg.mlc = custom_cell_inputs["mlc"]  
-
-      cell_cfg.cell_ratio = 1.0
-      cell_cfg.generate_cell_file()
-      cell_cfg.append_cell_file()
-  elif (cell_type == 'eDRAM' or cell_type == '3teDRAM'):
-      #Base eDRAM cell
-      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.eDRAMCellConfig(
-          cell_area_F2 = 60,
-          cell_file_path=cell_path)
-
-      # depending on exposed parameters per technology, check and assign input values
-      if "cell_size_F2" in custom_cell_inputs:
-          cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
-      if "access_CMOS_width" in custom_cell_inputs:
-          cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
-
-      cell_cfg.generate_cell_file()
-      cell_cfg.append_cell_file()
-
+      elif (cell_type == 'SRAM'):
+          #Base CryoMEMSRAM cell
+          cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.CryoMEMSRAMCellConfig()
   else:
-      #Base SRAM cell
-      cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.SRAMCellConfig(
-          cell_area_F2 = 146,
-          cell_file_path=cell_path)
+      ## Form cell cfgs and mem cfgs for best-case and worst-case default technologies
+      cell_path = "data/cell_cfgs/{}_{}.cell".format(cell_type, custom_cell_inputs["name"])
+  
+      # depending on cell type, initialize default cell, then over-write params as provided, then generate cell file
+  
+      if (cell_type == 'STT'):
+          cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.STTRAMCellConfig(
+              cell_file_path=cell_path,
+             )
+
+          # depending on exposed parameters per technology, check and assign input values
+          if "cell_size_F2" in custom_cell_inputs:
+              cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+          if "access_CMOS_width" in custom_cell_inputs:
+              cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
+          if "r_on" in custom_cell_inputs:
+              cell_cfg.r_on = custom_cell_inputs["r_on"]  
+          if "r_off" in custom_cell_inputs:
+              cell_cfg.r_off = custom_cell_inputs["r_off"]  
+          if "read_mode" in custom_cell_inputs:
+              cell_cfg.read_mode = custom_cell_inputs["read_mode"]  
+          if "read_voltage" in custom_cell_inputs:
+              cell_cfg.read_voltage = custom_cell_inputs["read_voltage"]  
+          if "min_sense_voltage" in custom_cell_inputs:
+              cell_cfg.min_sense_voltage = custom_cell_inputs["min_sense_voltage"]  
+          if "read_power" in custom_cell_inputs:
+              cell_cfg.read_power = custom_cell_inputs["read_power"]  
+          if "reset_mode" in custom_cell_inputs:
+              cell_cfg.reset_mode = custom_cell_inputs["reset_mode"]  
+          if "reset_current" in custom_cell_inputs:
+              cell_cfg.reset_current = custom_cell_inputs["reset_current"]  
+          if "reset_pulse" in custom_cell_inputs:
+              cell_cfg.reset_pulse = custom_cell_inputs["reset_pulse"]  
+          if "reset_energy" in custom_cell_inputs:
+              cell_cfg.reset_energy = custom_cell_inputs["reset_energy"]  
+          if "set_mode" in custom_cell_inputs:
+              cell_cfg.set_mode = custom_cell_inputs["set_mode"]  
+          if "set_current" in custom_cell_inputs:
+              cell_cfg.set_current = custom_cell_inputs["set_current"]  
+          if "set_pulse" in custom_cell_inputs:
+              cell_cfg.set_pulse = custom_cell_inputs["set_pulse"]  
+          if "set_energy" in custom_cell_inputs:
+              cell_cfg.set_energy = custom_cell_inputs["set_energy"]  
+          if "mlc" in custom_cell_inputs:
+              cell_cfg.mlc = custom_cell_inputs["mlc"]  
+          if "read_floating" in custom_cell_inputs:
+              cell_cfg.read_floating = custom_cell_inputs["read_floating"]  
+
+          cell_cfg.generate_cell_file()
+          cell_cfg.append_cell_file()
+      
+      elif (cell_type == 'PCM'):
+          cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.PCMCellConfig(
+              cell_file_path=cell_path,
+             )
+
+          # depending on exposed parameters per technology, check and assign input values
+          if "cell_size_F2" in custom_cell_inputs:
+              cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+          if "access_CMOS_width" in custom_cell_inputs:
+              cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
+          if "r_on" in custom_cell_inputs:
+              cell_cfg.r_on = custom_cell_inputs["r_on"]  
+          if "r_off" in custom_cell_inputs:
+              cell_cfg.r_off = custom_cell_inputs["r_off"]  
+          if "read_mode" in custom_cell_inputs:
+              cell_cfg.read_mode = custom_cell_inputs["read_mode"]  
+          if "read_voltage" in custom_cell_inputs:
+              cell_cfg.read_voltage = custom_cell_inputs["read_voltage"]  
+          if "read_current" in custom_cell_inputs:
+              cell_cfg.read_current = custom_cell_inputs["read_current"]  
+          if "read_energy" in custom_cell_inputs:
+              cell_cfg.read_energy = custom_cell_inputs["read_energy"]  
+          if "reset_mode" in custom_cell_inputs:
+              cell_cfg.reset_mode = custom_cell_inputs["reset_mode"]  
+          if "reset_current" in custom_cell_inputs:
+              cell_cfg.reset_current = custom_cell_inputs["reset_current"]  
+          if "reset_pulse" in custom_cell_inputs:
+              cell_cfg.reset_pulse = custom_cell_inputs["reset_pulse"]  
+          if "set_mode" in custom_cell_inputs:
+              cell_cfg.set_mode = custom_cell_inputs["set_mode"]  
+          if "set_current" in custom_cell_inputs:
+              cell_cfg.set_current = custom_cell_inputs["set_current"]  
+          if "set_pulse" in custom_cell_inputs:
+              cell_cfg.set_pulse = custom_cell_inputs["set_pulse"]  
+          if "mlc" in custom_cell_inputs:
+              cell_cfg.mlc = custom_cell_inputs["mlc"]  
+          
+          cell_cfg.generate_cell_file()
+          cell_cfg.append_cell_file()
+      
+      elif (cell_type == 'CTT'): #FIXME fill in with details
+          cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.CTTCellConfig()
+
+          # depending on exposed parameters per technology, check and assign input values
+          if "cell_size_F2" in custom_cell_inputs:
+              cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+
+ 
+      elif (cell_type == 'RRAM'):
+          cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.RRAMCellConfig(
+              cell_file_path=cell_path
+             )
+
+          # depending on exposed parameters per technology, check and assign input values
+          if "cell_size_F2" in custom_cell_inputs:
+              cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+          if "access_CMOS_width" in custom_cell_inputs:
+              cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
+          if "r_on_set_v" in custom_cell_inputs:
+              cell_cfg.r_on_set_v = custom_cell_inputs["r_on_set_v"]
+          if "r_off_set_v" in custom_cell_inputs:
+              cell_cfg.r_off_set_v = custom_cell_inputs["r_off_set_v"]
+          if "r_on_reset_v" in custom_cell_inputs:
+              cell_cfg.r_on_reset_v = custom_cell_inputs["r_on_reset_v"]
+          if "r_off_reset_v" in custom_cell_inputs:
+              cell_cfg.r_off_reset_v = custom_cell_inputs["r_off_reset_v"]
+          if "r_on_read_v" in custom_cell_inputs:
+              cell_cfg.r_on_read_v = custom_cell_inputs["r_on_read_v"]
+          if "r_off_read_v" in custom_cell_inputs:
+              cell_cfg.r_off_read_v = custom_cell_inputs["r_off_read_v"]
+          if "r_on_half_reset" in custom_cell_inputs:
+              cell_cfg.r_on_half_reset = custom_cell_inputs["r_on_half_reset"]
+          if "cap_on" in custom_cell_inputs:
+              cell_cfg.cap_on = custom_cell_inputs["cap_on"]
+          if "cap_off" in custom_cell_inputs:
+              cell_cfg.cap_off = custom_cell_inputs["cap_off"]
+          if "read_mode" in custom_cell_inputs:
+              cell_cfg.read_mode = custom_cell_inputs["read_mode"]  
+          if "read_voltage" in custom_cell_inputs:
+              cell_cfg.read_voltage = custom_cell_inputs["read_voltage"]  
+          if "read_power" in custom_cell_inputs:
+              cell_cfg.read_power = custom_cell_inputs["read_power"]  
+          if "reset_mode" in custom_cell_inputs:
+              cell_cfg.reset_mode = custom_cell_inputs["reset_mode"]  
+          if "reset_voltage" in custom_cell_inputs:
+              cell_cfg.reset_voltage = custom_cell_inputs["reset_voltage"]  
+          if "reset_pulse" in custom_cell_inputs:
+              cell_cfg.reset_pulse = custom_cell_inputs["reset_pulse"]  
+          if "reset_energy" in custom_cell_inputs:
+              cell_cfg.reset_energy = custom_cell_inputs["reset_energy"]  
+          if "set_mode" in custom_cell_inputs:
+              cell_cfg.set_mode = custom_cell_inputs["set_mode"]  
+          if "set_voltage" in custom_cell_inputs:
+              cell_cfg.set_voltage = custom_cell_inputs["set_voltage"]  
+          if "set_pulse" in custom_cell_inputs:
+              cell_cfg.set_pulse = custom_cell_inputs["set_pulse"]  
+          if "set_energy" in custom_cell_inputs:
+              cell_cfg.set_energy = custom_cell_inputs["set_energy"]  
+          if "mlc" in custom_cell_inputs:
+              cell_cfg.mlc = custom_cell_inputs["mlc"]  
+          if "read_floating" in custom_cell_inputs:
+              cell_cfg.read_floating = custom_cell_inputs["read_floating"]  
+          
+          cell_cfg.generate_cell_file()
+          cell_cfg.append_cell_file()
+
+      elif (cell_type == 'FeFET'):
+          cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.FeFETCellConfig(
+              cell_file_path=cell_path
+             )
+
+          # depending on exposed parameters per technology, check and assign input values
+          if "cell_size_F2" in custom_cell_inputs:
+              cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+          if "access_CMOS_width" in custom_cell_inputs:
+              cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
+          if "access_Vdrop" in custom_cell_inputs:
+              cell_cfg.access_Vdrop = custom_cell_inputs["access_Vdrop"]
+          if "r_on_set_v" in custom_cell_inputs:
+              cell_cfg.r_on_set_v = custom_cell_inputs["r_on_set_v"]
+          if "r_off_set_v" in custom_cell_inputs:
+              cell_cfg.r_off_set_v = custom_cell_inputs["r_off_set_v"]
+          if "r_on_reset_v" in custom_cell_inputs:
+              cell_cfg.r_on_reset_v = custom_cell_inputs["r_on_reset_v"]
+          if "r_off_reset_v" in custom_cell_inputs:
+              cell_cfg.r_off_reset_v = custom_cell_inputs["r_off_reset_v"]
+          if "r_on_read_v" in custom_cell_inputs:
+              cell_cfg.r_on_read_v = custom_cell_inputs["r_on_read_v"]
+          if "r_off_read_v" in custom_cell_inputs:
+              cell_cfg.r_off_read_v = custom_cell_inputs["r_off_read_v"]
+          if "r_on_half_reset" in custom_cell_inputs:
+              cell_cfg.r_on_half_reset = custom_cell_inputs["r_on_half_reset"]
+          if "cap_on" in custom_cell_inputs:
+              cell_cfg.cap_on = custom_cell_inputs["cap_on"]
+          if "cap_off" in custom_cell_inputs:
+              cell_cfg.cap_off = custom_cell_inputs["cap_off"]
+          if "read_mode" in custom_cell_inputs:
+              cell_cfg.read_mode = custom_cell_inputs["read_mode"]  
+          if "read_voltage" in custom_cell_inputs:
+              cell_cfg.read_voltage = custom_cell_inputs["read_voltage"]  
+          if "read_power" in custom_cell_inputs:
+              cell_cfg.read_power = custom_cell_inputs["read_power"]  
+          if "reset_mode" in custom_cell_inputs:
+              cell_cfg.reset_mode = custom_cell_inputs["reset_mode"]  
+          if "reset_voltage" in custom_cell_inputs:
+              cell_cfg.reset_voltage = custom_cell_inputs["reset_voltage"]  
+          if "reset_pulse" in custom_cell_inputs:
+              cell_cfg.reset_pulse = custom_cell_inputs["reset_pulse"]  
+          if "reset_energy" in custom_cell_inputs:
+              cell_cfg.reset_energy = custom_cell_inputs["reset_energy"]  
+          if "set_mode" in custom_cell_inputs:
+              cell_cfg.set_mode = custom_cell_inputs["set_mode"]  
+          if "set_voltage" in custom_cell_inputs:
+              cell_cfg.set_voltage = custom_cell_inputs["set_voltage"]  
+          if "set_pulse" in custom_cell_inputs:
+              cell_cfg.set_pulse = custom_cell_inputs["set_pulse"]  
+          if "set_energy" in custom_cell_inputs:
+              cell_cfg.set_energy = custom_cell_inputs["set_energy"]  
+          if "mlc" in custom_cell_inputs:
+              cell_cfg.mlc = custom_cell_inputs["mlc"]  
+
+          cell_cfg.cell_ratio = 1.0
+          cell_cfg.generate_cell_file()
+          cell_cfg.append_cell_file()
+      elif (cell_type == 'eDRAM' or cell_type == '3teDRAM'):
+          #Base eDRAM cell
+          cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.eDRAMCellConfig(
+              cell_area_F2 = 60,
+              cell_file_path=cell_path)
+
+          # depending on exposed parameters per technology, check and assign input values
+          if "cell_size_F2" in custom_cell_inputs:
+              cell_cfg.cell_area = custom_cell_inputs["cell_size_F2"]
+          if "access_CMOS_width" in custom_cell_inputs:
+              cell_cfg.access_CMOS_width = custom_cell_inputs["access_CMOS_width"]
+
+          cell_cfg.generate_cell_file()
+          cell_cfg.append_cell_file()
+
+      else:
+          #Base SRAM cell
+          cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.SRAMCellConfig(
+              cell_area_F2 = 146,
+              cell_file_path=cell_path)
 
       # depending on exposed parameters per technology, check and assign input values
       if "cell_size_F2" in custom_cell_inputs:
