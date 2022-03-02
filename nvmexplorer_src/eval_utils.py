@@ -13,12 +13,9 @@ def parse_cryomem_input_file(file_path): # helper function to parse cell cfgs an
     with open(file_path) as fp:
       line = fp.readline()
       while ' ' in line:
-          print(line.rpartition(' '))
           header=line.rpartition(' ')[0]
           header=header.replace('-','')
-          print('header: '+header)
           val=line.rpartition(' ')[2]
-          print('val: '+val)
           headers.append(header.rstrip())
           vals.append(val.rstrip())
           line = fp.readline()
