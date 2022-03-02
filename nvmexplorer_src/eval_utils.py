@@ -9,31 +9,34 @@ import csv
 def parse_cryomem_input_file(file_path): # helper function to parse cell cfgs and mem cfgs
   headers = []
   vals = []
-  if file_path != "":
-    with open(file_path) as fp:
-      line = fp.readline()
-      while ' ' in line:
-          header=line.rpartition(' ')[0]
-          header=header.replace('-','')
-          val=line.rpartition(' ')[2]
-          headers.append(header.rstrip())
-          vals.append(val.rstrip())
-          line = fp.readline()
+  with open(file_path) as fp:
+    line = fp.readline()
+    while ' ' in line:
+        if "-mem_density" in line or "-bus_freq" in line:
+           header=line.split(' ')[0]
+           header=header.replace('-','')
+           val=line.split(' ')[1]
+        else:
+           header=line.rpartition(' ')[0]
+           header=header.replace('-','')
+           val=line.rpartition(' ')[2]
+        headers.append(header.rstrip())
+        vals.append(val.rstrip())
+        line = fp.readline()
   return headers, vals
 
 def parse_nvsim_input_file(file_path): # helper function to parse cell cfgs and mem cfgs
   headers = []
   vals = []
-  if file_path != "":
-    with open(file_path) as fp:
-      line = fp.readline()
-      while ':' in line:
-          header=line.split(':')[0]
-          header=header.replace('-','')
-          val=line.split(':')[1]
-          headers.append(header.rstrip())
-          vals.append(val.rstrip())
-          line = fp.readline()
+  with open(file_path) as fp:
+    line = fp.readline()
+    while ':' in line:
+        header=line.split(':')[0]
+        header=header.replace('-','')
+        val=line.split(':')[1]
+        headers.append(header.rstrip())
+        vals.append(val.rstrip())
+        line = fp.readline()
   return headers, vals
 
 class ExperimentResult:
@@ -116,11 +119,10 @@ class ExperimentResult:
         if line.rstrip():
             print(line, end="")
 
+    cell_headers, cell_vals = parse_nvsim_input_file(cell_cfg_path)
     if simulator == 'cryomem':
-        cell_headers, cell_vals = parse_cryomem_input_file(cell_cfg_path)
         mem_headers, mem_vals = parse_cryomem_input_file(mem_cfg_path)
     else:
-        cell_headers, cell_vals = parse_nvsim_input_file(cell_cfg_path)
         mem_headers, mem_vals = parse_nvsim_input_file(mem_cfg_path)
 
     row_to_insert = ["Benchmark Name", "Read Accesses", "Write Accesses", "Total Dynamic Read Power (mW)", "Total Dynamic Write Power (mW)", "Total Power", "Total Dynamic Read Energy (mJ)", "Total Dynamic Write Energy (mJ)", "Total Read Latency (ms)", "Total Write Latency (ms)", "Read BW Util", "Write BW Util", "Area (mm^2)", "Area Efficiency (percent)", "Read Latency (ns)", "Write Latency (ns)", "Read Energy (pJ)", "Write Energy (pJ)", "Leakage Power (mW)", "Bits Per Cell"]
@@ -142,11 +144,10 @@ class ExperimentResult:
         if line.rstrip():
             print(line, end="")
 
+    cell_headers, cell_vals = parse_nvsim_input_file(cell_cfg_path)
     if simulator == 'cryomem':
-        cell_headers, cell_vals = parse_cryomem_input_file(cell_cfg_path)
         mem_headers, mem_vals = parse_cryomem_input_file(mem_cfg_path)
     else:
-        cell_headers, cell_vals = parse_nvsim_input_file(cell_cfg_path)
         mem_headers, mem_vals = parse_nvsim_input_file(mem_cfg_path)
 
     if "1BPC" in csv_file_path:

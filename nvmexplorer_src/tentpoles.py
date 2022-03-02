@@ -194,15 +194,21 @@ def gen_custom_cell(cell_type, custom_cell_inputs, simulator):
   """
 
   if (simulator == 'cryomem'):
-      cell_path = ""
+      cell_path = "data/cell_cfgs/CryoMEM_{}.cell".format(cell_type)
   
       if (cell_type == 'eDRAM' or cell_type == '3teDRAM'):
           #Base CryoMEM eDRAM cell
-          cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.CryoMEMeDRAMCellConfig()
+          cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.CryoMEMeDRAMCellConfig(
+                  cell_file_path=cell_path)
+          
+          cell_cfg.generate_cell_file()
 
       elif (cell_type == 'SRAM'):
           #Base CryoMEMSRAM cell
-          cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.CryoMEMSRAMCellConfig()
+          cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.CryoMEMSRAMCellConfig(
+                  cell_file_path=cell_path)
+          
+          cell_cfg.generate_cell_file()
   else:
       ## Form cell cfgs and mem cfgs for best-case and worst-case default technologies
       cell_path = "data/cell_cfgs/{}_{}.cell".format(cell_type, custom_cell_inputs["name"])

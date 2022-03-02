@@ -49,7 +49,7 @@ def load_spreadsheet_data(cell_type, output_path):
   return temp_df
 
 
-def set_sim_input_config(simulator, cfg_path, process_node, _opt_target, word_width, _capacity, banks, _stacked_die_count, _monolithic_layer_count, _temperature, cacti_config_file_path, cell_cfg):
+def set_sim_input_config(simulator, cfg_path, process_node, _opt_target, word_width, _capacity, banks, _stacked_die_count, _monolithic_layer_count, _temperature, cell_cfg):
   """ Returns best-case and worst-case input configs for either DESTINY or NVSim based
   on user configuration
 
@@ -218,7 +218,6 @@ if __name__ == '__main__':
   nvsim_path = "nvmexplorer_src/nvsim/nvsim"
   destiny_path = "../destiny/destiny"
   cryomem_path = "../CryoModel/CryoMEM/run.py"
-  cacti_config_file_path = ["../CryoModel/CryoMEM/configs/cache-sram.cfg"]
   output_path = "output"
   cell_tentpoles = True #by default, run a "tentpole" style study
 
@@ -290,9 +289,6 @@ if __name__ == '__main__':
   if "cryomem_path" in config["experiment"]:
       if config["experiment"]["cryomem_path"]:
           cryomem_path = config["experiment"]["cryomem_path"]
-  if "cacti_config_file_path" in config["experiment"]:
-      if config["experiment"]["cacti_config_file_path"]:
-          cacti_config_file_path = config["experiment"]["cacti_config_file_path"]
   if "output_path" in config["experiment"]:
       if config["experiment"]["output_path"]:
           output_path = config["experiment"]["output_path"]
@@ -302,7 +298,7 @@ if __name__ == '__main__':
   print("Successfully Loaded Config File")
   
   # The main loop of NVMExplorer
-  for idx, _cell_type in enumerate(cell_type):
+  for _cell_type in cell_type:
       for _opt_target in opt_target:
           for _capacity in capacity:
               for _banks in banks:
@@ -350,8 +346,8 @@ if __name__ == '__main__':
                                       worst_case_stderr_log = "{}/logs/{}_{}MB_{}_{}BPC_{}stackeddies_{}monolithiclayers_{}K-worst_case_error".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _stacked_die_count, _monolithic_layer_count, _temperature)
 
                                       ## Generate corresponding mem cfgs
-                                      sim_best_case_input_cfg = set_sim_input_config(simulator, best_case_cfg_path, process_node, _opt_target, word_width, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, cacti_config_file_path[idx], best_case_cell_cfg)
-                                      sim_worst_case_input_cfg = set_sim_input_config(simulator, worst_case_cfg_path, process_node, _opt_target, word_width, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, cacti_config_file_path[idx], worst_case_cell_cfg)
+                                      sim_best_case_input_cfg = set_sim_input_config(simulator, best_case_cfg_path, process_node, _opt_target, word_width, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, best_case_cell_cfg)
+                                      sim_worst_case_input_cfg = set_sim_input_config(simulator, worst_case_cfg_path, process_node, _opt_target, word_width, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, worst_case_cell_cfg)
                                       sim_worst_case_input_cfg.generate_mem_cfg()
                                       sim_best_case_input_cfg.generate_mem_cfg()
 
@@ -379,7 +375,7 @@ if __name__ == '__main__':
                                         extra_args = "{} {} 1 0.4 {} cache".format(_temperature, process_node, 1024*1024*_capacity) # for cryomem only; use cacti config corresponding to cell type
                                         this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, {"name":"default", "bits_per_cell":_bits_per_cell}, simulator)
                                         this_cfg_path = "data/mem_cfgs/{}_{}MB_{}banks_{}_{}BPC_{}stackeddies_{}monolithiclayers_{}K_{}.cfg".format(_cell_type, _capacity, _banks, _opt_target, _bits_per_cell, _stacked_die_count, _monolithic_layer_count, _temperature, "default")
-                                        sim_input_cfg = set_sim_input_config(simulator, this_cfg_path, process_node, _opt_target, word_width, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, cacti_config_file_path[idx], this_cell_cfg)
+                                        sim_input_cfg = set_sim_input_config(simulator, this_cfg_path, process_node, _opt_target, word_width, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, this_cell_cfg)
                                         sim_input_cfg.generate_mem_cfg()
                                         #assign paths for default cell
                                         cell_paths.append(this_cell_path)
@@ -399,7 +395,7 @@ if __name__ == '__main__':
                                               this_custom_cell_input["name"] = "custom"+_cell_type+str(i)
                                             this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, this_custom_cell_input)
                                             this_cfg_path = "data/mem_cfgs/{}_{}MB_{}banks_{}_{}BPC_{}stackeddies_{}monolithiclayers_{}K_{}.cfg".format(_cell_type, _capacity, _banks, _opt_target, _bits_per_cell, _stacked_die_count, _monolithic_layer_count, _temperature, this_custom_cell_input["name"])
-                                            sim_input_cfg = set_sim_input_config(simulator, this_cfg_path, process_node, _opt_target, word_width, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, cacti_config_file_path[idx], this_cell_cfg)
+                                            sim_input_cfg = set_sim_input_config(simulator, this_cfg_path, process_node, _opt_target, word_width, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, this_cell_cfg)
 
                                             sim_input_cfg.generate_mem_cfg()
                                             #assign paths for custom cell
