@@ -7,11 +7,15 @@ class DestinyInputConfig:
                 mem_cfg_file_path="../../data/mem_cfgs/test_SRAM.cfg", #path to destiny cfg input
 		process_node=45, #chosen node in nm
 		opt_target="ReadLatency", #optimization target
+                device_roadmap="LOP",
+                routing="non-H-tree",
 		word_width=64, #word width in bits
 		capacity=4, #capacity in MB
 		cell_type=SRAMCellConfig(), #pass the cell configuration
         stacked_die_count=1,
         partition_granularity=0,
+        temperature=350,
+        retention_time=40,
         local_tsv_projection=0,
         global_tsv_projection=0,
         tsv_redundancy=1.0,
@@ -28,11 +32,15 @@ class DestinyInputConfig:
     self.mem_cfg_file_path = mem_cfg_file_path
     self.process_node = process_node
     self.opt_target = opt_target
+    self.device_roadmap = device_roadmap
+    self.routing = routing
     self.word_width = word_width
     self.capacity = capacity
     self.cell_type = cell_type
     self.stacked_die_count = stacked_die_count
     self.partition_granularity = partition_granularity
+    self.temperature = temperature
+    self.retention_time = retention_time
     self.local_tsv_projection = local_tsv_projection
     self.global_tsv_projection = global_tsv_projection
     self.tsv_redundancy = tsv_redundancy
@@ -45,7 +53,6 @@ class DestinyInputConfig:
     self.force_bank_a = force_bank_a
     self.print_level = print_level
 
-
   def generate_mem_cfg(self):
     """ Creates a memory config file using characteristics of :class:`DestinyInputConfig` object 
     to be used as an input to Destiny
@@ -53,11 +60,18 @@ class DestinyInputConfig:
     cfg_file = open(self.mem_cfg_file_path, "w+")
     cfg_file.write(self.cell_type.mem_cfg_base)
     cfg_file.write("-ProcessNode: %d\n" % self.process_node+"\n")
+    #FIXME: temporary hack for tsmc eDRAM
+    cfg_file.write("-EnablePruning: Yes\n")
     cfg_file.write("-OptimizationTarget: "+self.opt_target+"\n")
+    cfg_file.write("-DeviceRoadmap: "+self.device_roadmap+"\n")
+    cfg_file.write("-Routing: "+self.routing+"\n")
     cfg_file.write("-WordWidth (bit): %d\n" % self.word_width+"\n")
-    cfg_file.write("-Capacity (MB): %d\n" % self.capacity+"\n") 
+    cfg_file.write("-Capacity (MB): %f\n" % self.capacity+"\n") 
     cfg_file.write("-StackedDieCount: %d\n" % self.stacked_die_count+"\n") #- Number of dies over which the memory is distributed
     cfg_file.write("-PartitionGranularity: %d\n" % self.partition_granularity+"\n")  
+    cfg_file.write("-Temperature (K): %d\n" % self.temperature+"\n")  
+    if self.cell_type.mem_cell_type == "eDRAM":
+      cfg_file.write("-RetentionTime (us): %d\n" % self.retention_time+"\n")  
     #0: Coarse granularity: This assumes that address, control, and data signals are 
     #broadcast to all stacked dies and decoded on the destination die. 
     #1: Fine granularity: This assumes that address signals are pre-decoded on a 
@@ -152,8 +166,6 @@ def parse_destiny_output(filepath='output_examples/sram_0', input_cfg=DestinyInp
   base = DestinyOutputConfig(input_cfg=input_cfg)
 
   with open(filepath, 'r') as f:
-    print("File path in parse_destiny_output")
-    print(filepath)
     lines = f.readlines()
 
   # Get rid of new lines

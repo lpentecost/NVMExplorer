@@ -74,12 +74,12 @@ class eDRAMCellConfig(NVSimCellConfig):
 		access_CMOS_width=1.31, #width of access (F)
                 cell_area_F2 = 60,
 		read_mode = "voltage",
+                minimum_sense_voltage = 10,
                 dram_cell_capacitance = '13e-15',
                 reset_voltage = "vdd",
                 set_voltage = "vdd",
     		mem_cfg_base = '''
 -DesignTarget: RAM
--DeviceRoadmap: LOP
 -LocalWireType: LocalAggressive
 -LocalWireRepeaterType: RepeatedNone
 -LocalWireUseLowSwing: No
@@ -88,7 +88,6 @@ class eDRAMCellConfig(NVSimCellConfig):
 -GlobalWireUseLowSwing: No
 -Routing: non-H-tree
 -InternalSensing: true
--RetentionTime (us): 40
 -BufferDesignOptimization: balanced
 '''
 		):
@@ -96,6 +95,7 @@ class eDRAMCellConfig(NVSimCellConfig):
     self.mem_cell_type = "eDRAM"
     self.cell_file_path=cell_file_path
     self.access_CMOS_width = access_CMOS_width
+    self.minimum_sense_voltage = minimum_sense_voltage
     self.read_mode = read_mode
     self.dram_cell_capacitance = dram_cell_capacitance
     self.reset_voltage = reset_voltage
@@ -110,9 +110,9 @@ class eDRAMCellConfig(NVSimCellConfig):
     cell_file.write("-AccessCMOSWidth (F): %f\n" % self.access_CMOS_width)
     cell_file.write("-ReadMode: "+self.read_mode+"\n")
     cell_file.write("-DRAMCellCapacitance (F): "+self.dram_cell_capacitance+"\n")
-    cell_file.write("-ResetVoltage (V): "+self.reset_voltage+"\n")
-    cell_file.write("-SetVoltage (V): "+self.set_voltage+"\n")
-    cell_file.write("-MinSenseVoltage (mV): 10\n")
+    cell_file.write("-ResetVoltage (V): "+str(self.reset_voltage)+"\n")
+    cell_file.write("-SetVoltage (V): "+str(self.set_voltage)+"\n")
+    cell_file.write("-MinSenseVoltage (mV): %d\n" % self.minimum_sense_voltage)
     cell_file.close()
 
 
