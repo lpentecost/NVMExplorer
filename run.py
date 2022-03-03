@@ -167,6 +167,7 @@ def run_sim(simulator, output_paths, log_dir, stdout_logs, stderr_logs, sim_path
       with open(stdout_logs[i], "w") as f_out:
         with open(stderr_logs[i], "w") as f_error:
           if simulator == "cryomem":
+            #print("python3.8 {} {} {}".format(sim_path, cfg_paths[i], extra_cryomem_args[i]))
             p1 = subprocess.Popen(["python3.8 {} {} {}".format(sim_path, cfg_paths[i], extra_cryomem_args[i])], stdout=f_out, stderr=f_error, shell=True)
           else:
             p1 = subprocess.Popen([sim_path, cfg_paths[i]],  stdout=f_out, stderr=f_error)
@@ -209,7 +210,7 @@ if __name__ == '__main__':
   cell_type = ["SRAM"]
   device_roadmap = "LOP"
   retention_time = 40
-  process_node = 22
+  process_node = [22]
   opt_target = ["ReadLatency"]
   word_width = 64
   capacity = 1
@@ -384,7 +385,7 @@ if __name__ == '__main__':
 
                                           if len(config["custom_cells"]) == 0: #use default values per technology
                                             extra_args = "{} {} 1 0.4 {} cache".format(_temperature, _process_node, 1024*1024*_capacity) # for cryomem only; use cacti config corresponding to cell type
-                                            this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, {"name":"default", "bits_per_cell":_bits_per_cell}, simulator)
+                                            this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, _temperature, {"name":"default", "bits_per_cell":_bits_per_cell}, simulator)
                                             this_cfg_path = "data/mem_cfgs/{}_{}MB_{}banks_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}.cfg".format(_cell_type, _capacity, _banks, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, "default")
                                             sim_input_cfg = set_sim_input_config(simulator, this_cfg_path, _process_node, _opt_target, word_width, device_roadmap, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, this_cell_cfg)
                                             sim_input_cfg.generate_mem_cfg()
@@ -404,7 +405,7 @@ if __name__ == '__main__':
                                               if this_custom_cell_input["cell_type"] == _cell_type:
                                                 if not "name" in this_custom_cell_input:
                                                   this_custom_cell_input["name"] = "custom"+_cell_type+str(i)
-                                                this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, this_custom_cell_input, simulator)
+                                                this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, _temperature, this_custom_cell_input, simulator)
                                                 this_cfg_path = "data/mem_cfgs/{}_{}MB_{}banks_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}.cfg".format(_cell_type, _capacity, _banks, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, this_custom_cell_input["name"])
                                                 sim_input_cfg = set_sim_input_config(simulator, this_cfg_path, _process_node, _opt_target, word_width, device_roadmap, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, this_cell_cfg)
 

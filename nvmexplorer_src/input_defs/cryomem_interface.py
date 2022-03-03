@@ -10,7 +10,7 @@ class CryoMEMInputConfig:
 		cell_type=CryoMEMSRAMCellConfig(), #pass the cell configuration
 		process_node=45, #chosen node in nm
                 temperature=350,
-                banks=128,
+                banks=1,
 		):
     self.mem_cfg_file_path = mem_cfg_file_path
     self.capacity = capacity
@@ -25,7 +25,6 @@ class CryoMEMInputConfig:
     """ Creates a memory config file using characteristics of :class:`CryoMEMInputConfig` object 
     to be used as an input to CryoMEM
     """
-    self.word_width = self.word_width/8
     self.process_node = self.process_node/1000
     self.capacity = self.capacity*1024*1024
     cfg_file = open(self.mem_cfg_file_path, "w+")
@@ -36,13 +35,13 @@ class CryoMEMInputConfig:
     cfg_file.write('-Bitline floating - "false"\n')
     cfg_file.write('-Interconnect Power Gating - "false"\n')
     cfg_file.write('-Power Gating Performance Loss 0.01\n')
-    cfg_file.write('-block size (bytes) %d\n' % self.word_width)
+    cfg_file.write('-block size (bytes) 64\n')
     cfg_file.write('-associativity 8\n')
     cfg_file.write('-read-write port 2\n')
     cfg_file.write('-exclusive read port 0\n')
     cfg_file.write('-exclusive write port 0\n')
     cfg_file.write('-single ended read ports 0\n')
-    cfg_file.write('-UCA bank count 128\n')
+    cfg_file.write('-UCA bank count %d\n' % self.banks+'\n')
     cfg_file.write('-technology (u) %f\n' % self.process_node+'\n')
     cfg_file.write('-page size (bits) 8192\n')
     cfg_file.write('-burst length 8\n')

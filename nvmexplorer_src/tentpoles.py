@@ -184,7 +184,7 @@ def form_tentpoles(data_df, cell_type, bits_per_cell):
 
 
 ## Generate cell configuration from user input
-def gen_custom_cell(cell_type, custom_cell_inputs, simulator):
+def gen_custom_cell(cell_type, temperature, custom_cell_inputs, simulator):
   """ Generates NVSim cell files for a specified cell type and input characteristics
 
   :param cell_type: String specifying which NVM technology to use
@@ -194,19 +194,19 @@ def gen_custom_cell(cell_type, custom_cell_inputs, simulator):
   """
 
   if (simulator == 'cryomem'):
-      cell_path = "data/cell_cfgs/CryoMEM_{}.cell".format(cell_type)
+      cell_path = "data/cell_cfgs/CryoMEM_{}_{}K.cell".format(cell_type, temperature)
   
       if (cell_type == 'eDRAM' or cell_type == '3teDRAM'):
           #Base CryoMEM eDRAM cell
           cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.CryoMEMeDRAMCellConfig(
-                  cell_file_path=cell_path)
+                  cell_file_path=cell_path, temperature=temperature)
           
           cell_cfg.generate_cell_file()
 
       elif (cell_type == 'SRAM'):
           #Base CryoMEMSRAM cell
           cell_cfg = nvmexplorer_src.input_defs.cell_cfgs.CryoMEMSRAMCellConfig(
-                  cell_file_path=cell_path)
+                  cell_file_path=cell_path, temperature=temperature)
           
           cell_cfg.generate_cell_file()
   else:

@@ -20,6 +20,20 @@ def parse_cryomem_input_file(file_path): # helper function to parse cell cfgs an
            header=line.rpartition(' ')[0]
            header=header.replace('-','')
            val=line.rpartition(' ')[2]
+        if "size (bytes)" in header:
+           header="Capacity (MB)"
+           val=int(float(val)/1024/1024)
+           val=str(val)
+        elif "technology (u)" in header:
+           header="ProcessNode"
+           val=int(float(val)*1000)
+           val=str(val)
+        elif "UCA bank count" in header:
+           header="Banks"
+        elif "output/input bus width" in header:
+           header="WordWidth (bit)"
+        elif "-Optimize ED or ED^2 (ED, ED^2, NONE):" in header:
+           header="OptimizationTarget"
         headers.append(header.rstrip())
         vals.append(val.rstrip())
         line = fp.readline()

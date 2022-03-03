@@ -473,34 +473,41 @@ class FeFETCellConfig(NVSimCellConfig):
 class CryoMEMCellConfig:
   def __init__(self,
                 cell_file_path="../../data/cell_cfgs/cryoMEM_SRAM.cell",
-		mem_cell_type="SRAM" #name of cell
+		mem_cell_type="SRAM", #name of cell
+                temperature = 300
 		):
     
     self.cell_file_path = cell_file_path
     self.mem_cell_type = mem_cell_type
+    self.temperature = temperature
   
   def generate_cell_file(self):
     cell_file = open(self.cell_file_path, "w+")
     cell_file.write("-MemCellType: "+self.mem_cell_type+"\n")
+    cell_file.write("-Temperature (K): "+str(self.temperature)+"\n")
     cell_file.close() 
 
 class CryoMEMSRAMCellConfig(CryoMEMCellConfig):
   def __init__(self, 
           cell_file_path = "../../data/cell_cfgs/cryoMEM_SRAM.cell",
-    		mem_cfg_base = ''
+    		mem_cfg_base = '',
+                temperature = 300
 		):
     CryoMEMCellConfig.__init__(self, cell_file_path=cell_file_path)
+    self.temperature = temperature
     self.mem_cfg_base = "\n" #customize base string for each technology
 
 class CryoMEMeDRAMCellConfig(CryoMEMCellConfig):
   def __init__(self,
           cell_file_path="../../data/cell_cfgs/cryoMEM_eDRAM.cell",
+                temperature = 300,
     		mem_cfg_base = '''
 -3T-eDRAM
 '''
 		):
     CryoMEMCellConfig.__init__(self, cell_file_path=cell_file_path)
     self.mem_cell_type = "eDRAM"
+    self.temperature = temperature
     self.mem_cfg_base = mem_cfg_base + "\n" #customize base string for each technology
 
 
