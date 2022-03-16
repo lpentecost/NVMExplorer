@@ -42,8 +42,7 @@ class SRAMCellConfig(NVSimCellConfig):
 -GlobalWireType: GlobalAggressive
 -GlobalWireRepeaterType: RepeatedNone
 -GlobalWireUseLowSwing: No
--Routing: non-H-tree
--InternalSensing: false
+-InternalSensing: true
 -BufferDesignOptimization: balanced
 '''
 		):
@@ -86,7 +85,6 @@ class eDRAMCellConfig(NVSimCellConfig):
 -GlobalWireType: GlobalAggressive
 -GlobalWireRepeaterType: RepeatedNone
 -GlobalWireUseLowSwing: No
--Routing: non-H-tree
 -InternalSensing: true
 -BufferDesignOptimization: balanced
 '''

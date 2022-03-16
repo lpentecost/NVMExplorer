@@ -8,7 +8,7 @@ class DestinyInputConfig:
 		process_node=45, #chosen node in nm
 		opt_target="ReadLatency", #optimization target
                 device_roadmap="LOP",
-                routing="non-H-tree",
+                routing="H-tree",
 		word_width=64, #word width in bits
 		capacity=4, #capacity in MB
 		cell_type=SRAMCellConfig(), #pass the cell configuration
@@ -23,6 +23,8 @@ class DestinyInputConfig:
         allow_difference_tag_tech=1,
         memory_cell_input_file="",
         print_all_optimals=0,
+        banks="",
+        mats="",
         force_bank_3d="",
         force_bank_3da="",
         force_bank_a="",
@@ -48,6 +50,8 @@ class DestinyInputConfig:
     self.allow_difference_tag_tech = allow_difference_tag_tech
     self.memory_cell_input_file = memory_cell_input_file
     self.print_all_optimals = print_all_optimals
+    self.banks = banks
+    self.mats = mats
     self.force_bank_3d = force_bank_3d
     self.force_bank_3da = force_bank_3da
     self.force_bank_a = force_bank_a
@@ -66,7 +70,16 @@ class DestinyInputConfig:
     cfg_file.write("-DeviceRoadmap: "+self.device_roadmap+"\n")
     cfg_file.write("-Routing: "+self.routing+"\n")
     cfg_file.write("-WordWidth (bit): %d\n" % self.word_width+"\n")
-    cfg_file.write("-Capacity (MB): %f\n" % self.capacity+"\n") 
+    capacity_KB = float(self.capacity)*1000
+    if self.capacity < 1:
+        cfg_file.write("-Capacity (KB): %f\n" % capacity_KB +"\n") 
+    else:
+        cfg_file.write("-Capacity (MB): %f\n" % self.capacity+"\n") 
+    #FIXME: temporary banking and mats for cryomem comparison
+    #if self.banks != "-1":
+    #    cfg_file.write("-ForceBank (Total AxB, Active CxD): " + self.banks+"\n")
+    #if self.mats != "":
+    #    cfg_file.write("-ForceMat (Total AxB, Active CxD): " + self.mats + "\n")
     cfg_file.write("-StackedDieCount: %d\n" % self.stacked_die_count+"\n") #- Number of dies over which the memory is distributed
     cfg_file.write("-PartitionGranularity: %d\n" % self.partition_granularity+"\n")  
     cfg_file.write("-Temperature (K): %d\n" % self.temperature+"\n")  

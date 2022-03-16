@@ -49,7 +49,7 @@ def load_spreadsheet_data(cell_type, output_path):
   return temp_df
 
 
-def set_sim_input_config(simulator, cfg_path, process_node, _opt_target, word_width, device_roadmap, _capacity, banks, _stacked_die_count, _monolithic_layer_count, _temperature, cell_cfg):
+def set_sim_input_config(simulator, cfg_path, process_node, _opt_target, word_width, device_roadmap, _capacity, banks, _bank_org, mat_org, _stacked_die_count, _monolithic_layer_count, _temperature, cell_cfg):
   """ Returns best-case and worst-case input configs for either DESTINY or NVSim based
   on user configuration
 
@@ -79,6 +79,9 @@ def set_sim_input_config(simulator, cfg_path, process_node, _opt_target, word_wi
                                        capacity = _capacity,
                                        stacked_die_count = _stacked_die_count,
                                        monolithic_layer_count = _monolithic_layer_count,
+                                       banks = _bank_org,
+                                       temperature = _temperature,
+                                       mats = mat_org,
                                        cell_type = cell_cfg)
 
   elif simulator == "cryomem":
@@ -216,6 +219,8 @@ if __name__ == '__main__':
   capacity = 1
   vdd_vth = [[0.5, 0.2]]
   banks = [1]
+  bank_org = "-1"
+  mat_org = ""
   bits_per_cell = [1]
   stacked_die_count = [1]
   monolithic_layer_count = [1]
@@ -289,6 +294,12 @@ if __name__ == '__main__':
   if "banks" in config["experiment"]:
       if config["experiment"]["banks"]:
           banks = config["experiment"]["banks"]
+  if "bank_org" in config["experiment"]:
+      if config["experiment"]["bank_org"]:
+          bank_org = config["experiment"]["bank_org"]
+  if "mat_org" in config["experiment"]:
+      if config["experiment"]["mat_org"]:
+          mat_org = config["experiment"]["mat_org"]
   if "vdd_vth" in config["experiment"]:
       if config["experiment"]["vdd_vth"]:
           vdd_vth = config["experiment"]["vdd_vth"]
@@ -318,153 +329,154 @@ if __name__ == '__main__':
           for _opt_target in opt_target:
               for _capacity in capacity:
                   for _banks in banks:
-                      for _bits_per_cell in bits_per_cell:
-                          for _stacked_die_count in stacked_die_count:
-                              for _monolithic_layer_count in monolithic_layer_count:
-                                  for _vdd_vth in vdd_vth: 
-                                      _vdd = _vdd_vth[0]
-                                      _vth = _vdd_vth[1]
-                                      for _temperature in temperature:
-                                          access_pattern = nvmexplorer_src.input_defs.access_pattern.PatternConfig(exp_name = exp_name,
-                                              read_freq = read_frequency,
-                                              read_size = read_size,
-                                              write_freq = write_frequency,
-                                              write_size = write_size,
-                                              workingset = working_set)
-                                          
-                                          # Loads data from NVM database
-                                          if _cell_type != "eDRAM":
-                                              data_df = load_spreadsheet_data(_cell_type, output_path)
+                      for _bank_org in bank_org:
+                          for _bits_per_cell in bits_per_cell:
+                              for _stacked_die_count in stacked_die_count:
+                                  for _monolithic_layer_count in monolithic_layer_count:
+                                      for _vdd_vth in vdd_vth: 
+                                          _vdd = _vdd_vth[0]
+                                          _vth = _vdd_vth[1]
+                                          for _temperature in temperature:
+                                              access_pattern = nvmexplorer_src.input_defs.access_pattern.PatternConfig(exp_name = exp_name,
+                                                  read_freq = read_frequency,
+                                                  read_size = read_size,
+                                                  write_freq = write_frequency,
+                                                  write_size = write_size,
+                                                  workingset = working_set)
                                               
-                                          ## Define the paths
-                                          log_dir = "{}/logs".format(output_path) # This is where we'll store stdout and stderr for each NVSim run for debugging and/or post-processing purposes
-                                          output_dir = "{}/sim_output".format(output_path) # This is where we'll store the pickled results. In case we are doing a run that doesn't require re-running NVSim
-                                          if not os.path.exists(log_dir): 
-                                              os.makedirs(log_dir)
-                                          if not os.path.exists(output_dir): 
-                                              os.makedirs(output_dir)
-                                          if not os.path.exists("{}/results".format(output_path)): 
-                                              os.makedirs("{}/results".format(output_path))
-                                          if not os.path.exists("data/mem_cfgs"): 
-                                              os.makedirs("data/mem_cfgs")
+                                              # Loads data from NVM database
+                                              if _cell_type != "eDRAM":
+                                                  data_df = load_spreadsheet_data(_cell_type, output_path)
+                                                  
+                                              ## Define the paths
+                                              log_dir = "{}/logs".format(output_path) # This is where we'll store stdout and stderr for each NVSim run for debugging and/or post-processing purposes
+                                              output_dir = "{}/sim_output".format(output_path) # This is where we'll store the pickled results. In case we are doing a run that doesn't require re-running NVSim
+                                              if not os.path.exists(log_dir): 
+                                                  os.makedirs(log_dir)
+                                              if not os.path.exists(output_dir): 
+                                                  os.makedirs(output_dir)
+                                              if not os.path.exists("{}/results".format(output_path)): 
+                                                  os.makedirs("{}/results".format(output_path))
+                                              if not os.path.exists("data/mem_cfgs"): 
+                                                  os.makedirs("data/mem_cfgs")
 
-                                          results_csv = "{}/results/{}_{}MB_{}banks_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}-{}.csv".format(output_path, _cell_type, _capacity, _banks, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, simulator, exp_name)    
-                                          if os.path.exists(results_csv):
-                                              os.remove(results_csv)
+                                              results_csv = "{}/results/{}_{}MB_{}banks_{}bankorg_{}matorg_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}-{}.csv".format(output_path, _cell_type, _capacity, _banks, _bank_org, mat_org, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, simulator, exp_name)    
+                                              if os.path.exists(results_csv):
+                                                  os.remove(results_csv)
 
 
-                                          if (cell_tentpoles == True): #set up default, tentpole-style study per cell type
-                                              # Creates the tentpoles per technology
-                                              best_case_cell_path, worst_case_cell_path, best_case_cell_cfg, worst_case_cell_cfg = form_tentpoles(data_df, _cell_type, _bits_per_cell)
+                                              if (cell_tentpoles == True): #set up default, tentpole-style study per cell type
+                                                  # Creates the tentpoles per technology
+                                                  best_case_cell_path, worst_case_cell_path, best_case_cell_cfg, worst_case_cell_cfg = form_tentpoles(data_df, _cell_type, _bits_per_cell)
 
-                                              best_case_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}-best_case.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth)
-                                              worst_case_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}-worst_case.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth)
-                                              best_case_stdout_log = "{}/logs/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}-best_case_output".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth)
-                                              best_case_stderr_log = "{}/logs/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}-best_case_error".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth)
-                                              worst_case_stdout_log = "{}/logs/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}-worst_case_output".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth)
-                                              worst_case_stderr_log = "{}/logs/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}-worst_case_error".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth)
+                                                  best_case_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}-best_case.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth)
+                                                  worst_case_cfg_path = "data/mem_cfgs/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}-worst_case.cfg".format(_cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth)
+                                                  best_case_stdout_log = "{}/logs/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}-best_case_output".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth)
+                                                  best_case_stderr_log = "{}/logs/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}-best_case_error".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth)
+                                                  worst_case_stdout_log = "{}/logs/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}-worst_case_output".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth)
+                                                  worst_case_stderr_log = "{}/logs/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}-worst_case_error".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth)
 
-                                              ## Generate corresponding mem cfgs
-                                              sim_best_case_input_cfg = set_sim_input_config(simulator, best_case_cfg_path, _process_node, _opt_target, word_width, device_roadmap, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, best_case_cell_cfg)
-                                              sim_worst_case_input_cfg = set_sim_input_config(simulator, worst_case_cfg_path, _process_node, _opt_target, word_width, device_roadmap, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, worst_case_cell_cfg)
-                                              sim_worst_case_input_cfg.generate_mem_cfg()
-                                              sim_best_case_input_cfg.generate_mem_cfg()
+                                                  ## Generate corresponding mem cfgs
+                                                  sim_best_case_input_cfg = set_sim_input_config(simulator, best_case_cfg_path, _process_node, _opt_target, word_width, device_roadmap, _capacity, _banks, _bank_org, mat_org, _stacked_die_count, _monolithic_layer_count, _temperature, best_case_cell_cfg)
+                                                  sim_worst_case_input_cfg = set_sim_input_config(simulator, worst_case_cfg_path, _process_node, _opt_target, word_width, device_roadmap, _capacity, _banks, _bank_org, mat_org, _stacked_die_count, _monolithic_layer_count, _temperature, worst_case_cell_cfg)
+                                                  sim_worst_case_input_cfg.generate_mem_cfg()
+                                                  sim_best_case_input_cfg.generate_mem_cfg()
 
-                                              worst_output_path = "{}/sim_output/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}b-worst_case_sim_output.pkl".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, word_width)
-                                              best_output_path = "{}/sim_output/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}b-best_case_sim_output.pkl".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, word_width)
-                                              #group paths to be compatible with run_nvsim parallelism
-                                              cell_paths = [worst_case_cell_path, best_case_cell_path]
-                                              cell_cfgs = [worst_case_cell_cfg, best_case_cell_cfg]
-                                              output_paths = [worst_output_path, best_output_path]
-                                              stdout_logs = [worst_case_stdout_log, best_case_stdout_log]
-                                              stderr_logs = [worst_case_stderr_log, best_case_stderr_log]
-                                              cfg_paths = [worst_case_cfg_path, best_case_cfg_path]
-                                              sim_input_cfgs = [sim_worst_case_input_cfg, sim_best_case_input_cfg]
-                                          else: #initialize cell configs according to input over-rides or default settings
-                                              cell_paths = []
-                                              cell_cfgs = []
-                                              output_paths = []
-                                              stdout_logs = []
-                                              stderr_logs = []
-                                              cfg_paths = []
-                                              sim_input_cfgs = []
-                                              extra_cryomem_args = []
+                                                  worst_output_path = "{}/sim_output/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}b-worst_case_sim_output.pkl".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, word_width)
+                                                  best_output_path = "{}/sim_output/{}_{}MB_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}b-best_case_sim_output.pkl".format(output_path, _cell_type, _capacity, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, word_width)
+                                                  #group paths to be compatible with run_nvsim parallelism
+                                                  cell_paths = [worst_case_cell_path, best_case_cell_path]
+                                                  cell_cfgs = [worst_case_cell_cfg, best_case_cell_cfg]
+                                                  output_paths = [worst_output_path, best_output_path]
+                                                  stdout_logs = [worst_case_stdout_log, best_case_stdout_log]
+                                                  stderr_logs = [worst_case_stderr_log, best_case_stderr_log]
+                                                  cfg_paths = [worst_case_cfg_path, best_case_cfg_path]
+                                                  sim_input_cfgs = [sim_worst_case_input_cfg, sim_best_case_input_cfg]
+                                              else: #initialize cell configs according to input over-rides or default settings
+                                                  cell_paths = []
+                                                  cell_cfgs = []
+                                                  output_paths = []
+                                                  stdout_logs = []
+                                                  stderr_logs = []
+                                                  cfg_paths = []
+                                                  sim_input_cfgs = []
+                                                  extra_cryomem_args = []
 
-                                              if len(config["custom_cells"]) == 0: #use default values per technology
-                                                if _capacity < 1:
-                                                    scaled_capacity = int(_capacity*1000*1024)
-                                                else:
-                                                    scaled_capacity = _capacity*1024*1024
-                                                extra_args = "{} {} {} {} {} cache".format(_temperature, _process_node, _vdd, _vth, scaled_capacity) # for cryomem only; use cacti config corresponding to cell type
-                                                this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, _temperature, _vdd, _vth, {"name":"default", "bits_per_cell":_bits_per_cell}, simulator)
-                                                this_cfg_path = "data/mem_cfgs/{}_{}MB_{}banks_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}.cfg".format(_cell_type, _capacity, _banks, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, "default")
-                                                sim_input_cfg = set_sim_input_config(simulator, this_cfg_path, _process_node, _opt_target, word_width, device_roadmap, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, this_cell_cfg)
-                                                sim_input_cfg.generate_mem_cfg()
-                                                #assign paths for default cell
-                                                cell_paths.append(this_cell_path)
-                                                cell_cfgs.append(this_cell_cfg)
-                                                cfg_paths.append(this_cfg_path)
-                                                sim_input_cfgs.append(sim_input_cfg)
-                                                extra_cryomem_args.append(extra_args)
-                                                output_paths.append("{}/sim_output/{}_{}MB_{}banks_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}b_{}_{}_output.pkl".format(output_path, _cell_type, _capacity, _banks, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, word_width, "default", simulator))
-                                                stdout_logs.append("{}/logs/{}_{}MB_{}banks_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}_output".format(output_path, _cell_type, _capacity, _banks, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, "default"))
-                                                stderr_logs.append("{}/logs/{}_{}MB_{}banks_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}_error".format(output_path, _cell_type, _capacity, _banks, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, "default"))
-                                              else:
-                                                for i in range(len(config["custom_cells"])):
-                                                  this_custom_cell_input = config["custom_cells"][i]
-                                                  #if no name, assign a unique one
-                                                  if this_custom_cell_input["cell_type"] == _cell_type:
-                                                    if not "name" in this_custom_cell_input:
-                                                      this_custom_cell_input["name"] = "custom"+_cell_type+str(i)
-                                                    this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, _temperature, _vdd, _vth, this_custom_cell_input, simulator)
-                                                    this_cfg_path = "data/mem_cfgs/{}_{}MB_{}banks_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}.cfg".format(_cell_type, _capacity, _banks, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, this_custom_cell_input["name"])
-                                                    sim_input_cfg = set_sim_input_config(simulator, this_cfg_path, _process_node, _opt_target, word_width, device_roadmap, _capacity, _banks, _stacked_die_count, _monolithic_layer_count, _temperature, this_cell_cfg)
-
+                                                  if len(config["custom_cells"]) == 0: #use default values per technology
+                                                    if _capacity < 1:
+                                                        scaled_capacity = int(_capacity*1000*1024)
+                                                    else:
+                                                        scaled_capacity = _capacity*1024*1024
+                                                    extra_args = "{} {} {} {} {} cache".format(_temperature, _process_node, _vdd, _vth, scaled_capacity) # for cryomem only; use cacti config corresponding to cell type
+                                                    this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, _temperature, _vdd, _vth, {"name":"default", "bits_per_cell":_bits_per_cell}, simulator)
+                                                    this_cfg_path = "data/mem_cfgs/{}_{}MB_{}banks_{}bankorg_{}matorg_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}.cfg".format(_cell_type, _capacity, _banks, _bank_org, mat_org, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, "default")
+                                                    sim_input_cfg = set_sim_input_config(simulator, this_cfg_path, _process_node, _opt_target, word_width, device_roadmap, _capacity, _banks, _bank_org, mat_org, _stacked_die_count, _monolithic_layer_count, _temperature, this_cell_cfg)
                                                     sim_input_cfg.generate_mem_cfg()
-                                                    #assign paths for custom cell
+                                                    #assign paths for default cell
                                                     cell_paths.append(this_cell_path)
                                                     cell_cfgs.append(this_cell_cfg)
                                                     cfg_paths.append(this_cfg_path)
                                                     sim_input_cfgs.append(sim_input_cfg)
-                                                    output_paths.append("{}/sim_output/{}_{}MB_{}banks_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}b_{}_{}_output.pkl".format(output_path, _cell_type, _capacity, _banks, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, word_width, this_custom_cell_input["name"], simulator))
-                                                    stdout_logs.append("{}/logs/{}_{}MB_{}banks_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}_output".format(output_path, _cell_type, _capacity, _banks, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, this_custom_cell_input["name"]))
-                                                    stderr_logs.append("{}/logs/{}_{}MB_{}banks_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}_error".format(output_path, _cell_type, _capacity, _banks, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, this_custom_cell_input["name"]))
+                                                    extra_cryomem_args.append(extra_args)
+                                                    output_paths.append("{}/sim_output/{}_{}MB_{}banks_{}bankorg_{}matorg_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}b_{}_{}_output.pkl".format(output_path, _cell_type, _capacity, _banks, _bank_org, mat_org, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, word_width, "default", simulator))
+                                                    stdout_logs.append("{}/logs/{}_{}MB_{}banks_{}bankorg_{}matorg_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}_output".format(output_path, _cell_type, _capacity, _banks, _bank_org, mat_org, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, "default"))
+                                                    stderr_logs.append("{}/logs/{}_{}MB_{}banks_{}bankorg_{}matorg_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}_error".format(output_path, _cell_type, _capacity, _banks, _bank_org, mat_org, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, "default"))
+                                                  else:
+                                                    for i in range(len(config["custom_cells"])):
+                                                      this_custom_cell_input = config["custom_cells"][i]
+                                                      #if no name, assign a unique one
+                                                      if this_custom_cell_input["cell_type"] == _cell_type:
+                                                        if not "name" in this_custom_cell_input:
+                                                          this_custom_cell_input["name"] = "custom"+_cell_type+str(i)
+                                                        this_cell_path, this_cell_cfg = gen_custom_cell(_cell_type, _temperature, _vdd, _vth, this_custom_cell_input, simulator)
+                                                        this_cfg_path = "data/mem_cfgs/{}_{}MB_{}banks_{}bankorg_{}matorg_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}K_{}_{}_{}.cfg".format(_cell_type, _capacity, _banks, _bank_org, mat_org, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, _temperature, _vdd, _vth, this_custom_cell_input["name"])
+                                                        sim_input_cfg = set_sim_input_config(simulator, this_cfg_path, _process_node, _opt_target, word_width, device_roadmap, _capacity, _banks, _bank_org, mat_org, _stacked_die_count, _monolithic_layer_count, _temperature, this_cell_cfg)
 
-                                          # Run modified nvsim or destiny on cell configs
-                                          sim_outputs = run_sim_wrapper(simulator, output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, destiny_path, cryomem_path, cfg_paths, sim_input_cfgs, extra_cryomem_args, _temperature, output_dir)
-                                          
-                                          # Report results, add cell config params, mem config params, and whatever we are sweeping to the header
-                                          for i in range(len(sim_outputs)):
-                                              result = ExperimentResult(access_pattern, sim_input_cfgs[i], sim_outputs[i])
-                                              result.evaluate() 
+                                                        sim_input_cfg.generate_mem_cfg()
+                                                        #assign paths for custom cell
+                                                        cell_paths.append(this_cell_path)
+                                                        cell_cfgs.append(this_cell_cfg)
+                                                        cfg_paths.append(this_cfg_path)
+                                                        sim_input_cfgs.append(sim_input_cfg)
+                                                        output_paths.append("{}/sim_output/{}_{}MB_{}banks_{}bankorg_{}matorg_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}b_{}_{}_output.pkl".format(output_path, _cell_type, _capacity, _banks, _bank_org, mat_org, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, word_width, this_custom_cell_input["name"], simulator))
+                                                        stdout_logs.append("{}/logs/{}_{}MB_{}banks_{}bankorg_{}matorg_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}_output".format(output_path, _cell_type, _capacity, _banks, _bank_org, mat_org, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, this_custom_cell_input["name"]))
+                                                        stderr_logs.append("{}/logs/{}_{}MB_{}banks_{}bankorg_{}matorg_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}_error".format(output_path, _cell_type, _capacity, _banks, _bank_org, mat_org, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, this_custom_cell_input["name"]))
+
+                                              # Run modified nvsim or destiny on cell configs
+                                              sim_outputs = run_sim_wrapper(simulator, output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, destiny_path, cryomem_path, cfg_paths, sim_input_cfgs, extra_cryomem_args, _temperature, output_dir)
+                                              
+                                              # Report results, add cell config params, mem config params, and whatever we are sweeping to the header
+                                              for i in range(len(sim_outputs)):
+                                                  result = ExperimentResult(access_pattern, sim_input_cfgs[i], sim_outputs[i])
+                                                  result.evaluate() 
  
-                                              print("Retrieved Array-Level Results; Running Analytical Model")
-                                             
-                                              # Run application-level sweeps and save results
-                                              #FIXME also add conditional for customized traffic inputs
-                                              if len(traffic) > 0:
-                                                  # First function call prints header to the spreadsheet, second one prints to csv. Only need to report the header once
-                                                  result.report_header_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], simulator) 
-                                                  
-                                                  if "generic" in traffic:
-                                                      # GENERIC traffic sweep; report all outputs  
-                                                      generic_traffic(access_pattern, sim_input_cfgs, sim_outputs, results_csv, cell_paths, cfg_paths, simulator)
+                                                  print("Retrieved Array-Level Results; Running Analytical Model")
+                                                 
+                                                  # Run application-level sweeps and save results
+                                                  #FIXME also add conditional for customized traffic inputs
+                                                  if len(traffic) > 0:
+                                                      # First function call prints header to the spreadsheet, second one prints to csv. Only need to report the header once
+                                                      result.report_header_benchmark(1, results_csv, cell_paths[i], cfg_paths[i], simulator) 
                                                       
-                                                  if "graph" in traffic:
-                                                      # Graph traffic sweep
-                                                      graph_traffic(graph8MB, access_pattern, sim_input_cfgs, sim_outputs, results_csv, cell_paths, cfg_paths, simulator)
+                                                      if "generic" in traffic:
+                                                          # GENERIC traffic sweep; report all outputs  
+                                                          generic_traffic(access_pattern, sim_input_cfgs, sim_outputs, results_csv, cell_paths, cfg_paths, simulator)
+                                                          
+                                                      if "graph" in traffic:
+                                                          # Graph traffic sweep
+                                                          graph_traffic(graph8MB, access_pattern, sim_input_cfgs, sim_outputs, results_csv, cell_paths, cfg_paths, simulator)
 
-                                                  if "dnn" in traffic:
-                                                      # DNN traffic sweep
-                                                      dnn_traffic(DNN_weights, DNN_weights_acts, access_pattern, sim_input_cfgs, sim_outputs, results_csv, cell_paths, cfg_paths, simulator)
+                                                      if "dnn" in traffic:
+                                                          # DNN traffic sweep
+                                                          dnn_traffic(DNN_weights, DNN_weights_acts, access_pattern, sim_input_cfgs, sim_outputs, results_csv, cell_paths, cfg_paths, simulator)
 
-                                                  if "spec" in traffic:
-                                                      # SPEC2017 traffic
-                                                      spec_traffic(spec8MBLLC, spec16MBLLC, spec16MBDRAM, spec16MBL2, spec32MBLLC, spec64MBLLC, access_pattern, sim_input_cfgs, sim_outputs, results_csv, cell_paths, cfg_paths, simulator)
+                                                      if "spec" in traffic:
+                                                          # SPEC2017 traffic
+                                                          spec_traffic(spec8MBLLC, spec16MBLLC, spec16MBDRAM, spec16MBL2, spec32MBLLC, spec64MBLLC, access_pattern, sim_input_cfgs, sim_outputs, results_csv, cell_paths, cfg_paths, simulator)
 
-                                                  if "generic_write_buff" in traffic:
-                                                      #next, run generic traffic with write buffer proxy
-                                                      generic_traffic_with_write_buff(access_pattern, sim_input_cfgs, sim_outputs, results_csv, cell_paths, cfg_paths, simulator)
-                  
+                                                      if "generic_write_buff" in traffic:
+                                                          #next, run generic traffic with write buffer proxy
+                                                          generic_traffic_with_write_buff(access_pattern, sim_input_cfgs, sim_outputs, results_csv, cell_paths, cfg_paths, simulator)
+                      
       combine_csv(_cell_type, _bits_per_cell, simulator, exp_name)
       print("Reported Results; Evaluation Complete")

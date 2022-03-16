@@ -50,6 +50,9 @@ def parse_nvsim_input_file(file_path): # helper function to parse cell cfgs and 
         header=line.split(':')[0]
         header=header.replace('-','')
         val=line.split(':')[1]
+        if header == 'Capacity (KB)':
+            header = 'Capacity (MB)'
+            val = str(float(val)/1000)
         headers.append(header.rstrip())
         vals.append(val.rstrip())
         line = fp.readline()
