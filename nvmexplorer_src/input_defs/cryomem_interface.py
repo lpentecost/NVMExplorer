@@ -26,7 +26,10 @@ class CryoMEMInputConfig:
     to be used as an input to CryoMEM
     """
     self.process_node = self.process_node/1000
-    self.capacity = self.capacity*1024*1024
+    if self.capacity < 1:
+        self.capacity = self.capacity*1000*1024
+    else:
+        self.capacity = self.capacity*1024*1024
     cfg_file = open(self.mem_cfg_file_path, "w+")
     cfg_file.write('-size (bytes) %d\n' % self.capacity+'\n')
     cfg_file.write('-Array Power Gating - "false"\n')
@@ -59,7 +62,7 @@ class CryoMEMInputConfig:
     cfg_file.write('-deviate (delay, dynamic power, leakage power, cycle time, area) 0:100:100:0:100\n')
     cfg_file.write('-NUCAdesign objective (weight delay, dynamic power, leakage power, cycle time, area) 100:100:0:0:100\n')
     cfg_file.write('-NUCAdeviate (delay, dynamic power, leakage power, cycle time, area) 10:10000:10000:10000:10000\n')
-    cfg_file.write('-Optimize ED or ED^2 (ED, ED^2, NONE): "ED^2"\n')
+    cfg_file.write('-Optimize ED or ED^2 (ED, ED^2, NONE): "ED"\n')
     cfg_file.write('-Cache model (NUCA, UCA)  - "UCA"\n')
     cfg_file.write('-NUCA bank count 0\n')
     cfg_file.write('-Wire signaling (fullswing, lowswing, default) - "Global_30"\n')
