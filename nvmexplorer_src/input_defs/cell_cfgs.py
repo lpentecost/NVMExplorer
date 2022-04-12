@@ -34,7 +34,6 @@ class SRAMCellConfig(NVSimCellConfig):
                 cell_area_F2 = 0.0,
 		read_mode = "voltage",
     		mem_cfg_base = '''
--DesignTarget: RAM
 -DeviceRoadmap: LOP
 -LocalWireType: LocalAggressive
 -LocalWireRepeaterType: RepeatedNone
@@ -78,7 +77,6 @@ class eDRAMCellConfig(NVSimCellConfig):
                 reset_voltage = "vdd",
                 set_voltage = "vdd",
     		mem_cfg_base = '''
--DesignTarget: RAM
 -LocalWireType: LocalAggressive
 -LocalWireRepeaterType: RepeatedNone
 -LocalWireUseLowSwing: No
@@ -143,7 +141,6 @@ class RRAMCellConfig(NVSimCellConfig):
 	mlc = 1, #bits per cell
 	read_floating = False,
     	mem_cfg_base = '''
--DesignTarget: RAM
 -DeviceRoadmap: LOP
 -LocalWireType: LocalAggressive
 -LocalWireRepeaterType: RepeatedNone
@@ -238,7 +235,6 @@ class STTRAMCellConfig(NVSimCellConfig):
 	mlc = 1, #bits per cell
 	read_floating = False,
     	mem_cfg_base = '''
--DesignTarget: RAM
 -DeviceRoadmap: LOP
 -LocalWireType: LocalAggressive
 -LocalWireRepeaterType: RepeatedNone
@@ -313,7 +309,6 @@ class PCMCellConfig(NVSimCellConfig):
         set_pulse = 150, #ns
 	mlc = 1, #bits per cell
     	mem_cfg_base = '''
--DesignTarget: RAM
 -DeviceRoadmap: LOP
 -LocalWireType: LocalAggressive
 -LocalWireRepeaterType: RepeatedNone
@@ -394,7 +389,6 @@ class FeFETCellConfig(NVSimCellConfig):
 	mlc = 1, #bits per cell
 	read_floating = False,
     	mem_cfg_base = '''
--DesignTarget: RAM
 -DeviceRoadmap: LSTP
 -LocalWireType: LocalAggressive
 -LocalWireRepeaterType: RepeatedNone
