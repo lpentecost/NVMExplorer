@@ -105,7 +105,7 @@ def set_sim_input_config(simulator, cfg_path, design_target, cache_access_mode, 
 
   return sim_input_cfg
 
-def run_sim_wrapper(simulator, output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, destiny_path, cryomem_path, cfg_paths, sim_input_cfgs, extra_cryomem_args, temperature, output_dir):
+def run_sim_wrapper(simulator, design_target, output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, destiny_path, cryomem_path, cfg_paths, sim_input_cfgs, extra_cryomem_args, temperature, output_dir):
   """ Wrapper for the run_sim() function
 
   :param simulator: which simulator is used (destiny or nvsim)
@@ -132,7 +132,7 @@ def run_sim_wrapper(simulator, output_paths, log_dir, stdout_logs, stderr_logs, 
   """
 
   if simulator == "destiny":
-      sim_outputs = run_sim(simulator, output_paths, log_dir, stdout_logs, stderr_logs, destiny_path, cfg_paths, sim_input_cfgs, extra_cryomem_args, temperature, output_dir)
+      sim_outputs = run_sim(simulator, design_target, output_paths, log_dir, stdout_logs, stderr_logs, destiny_path, cfg_paths, sim_input_cfgs, extra_cryomem_args, temperature, output_dir)
   elif simulator == "cryomem":
       sim_outputs = run_sim(simulator, output_paths, log_dir, stdout_logs, stderr_logs, cryomem_path, cfg_paths, sim_input_cfgs, extra_cryomem_args, temperature, output_dir)
   else: #nvsim
@@ -141,7 +141,7 @@ def run_sim_wrapper(simulator, output_paths, log_dir, stdout_logs, stderr_logs, 
   return sim_outputs
 
 
-def run_sim(simulator, output_paths, log_dir, stdout_logs, stderr_logs, sim_path, cfg_paths, sim_input_cfgs, extra_cryomem_args, temperature, output_dir):
+def run_sim(simulator, design_target, output_paths, log_dir, stdout_logs, stderr_logs, sim_path, cfg_paths, sim_input_cfgs, extra_cryomem_args, temperature, output_dir):
   """ Returns NVSim or DESTINY output from simulating user-specified cell definitions
   in parallel and pickles the output. NVSim is only run if pickles do not already
   exist
@@ -190,7 +190,11 @@ def run_sim(simulator, output_paths, log_dir, stdout_logs, stderr_logs, sim_path
   sim_outputs = []
   for i in range(len(output_paths)):
     if simulator == "destiny":
-      sim_output = nvmexplorer_src.input_defs.destiny_interface.parse_destiny_output(stdout_logs[i], input_cfg=sim_input_cfgs[i])
+      if design_target == "cache":
+        sim_output = nvmexplorer_src.input_defs.destiny_interface.parse_destiny_output_cache(stdout_logs[i], input_cfg=sim_input_cfgs[i])
+        sim_output.print_summary()
+      else:
+        sim_output = nvmexplorer_src.input_defs.destiny_interface.parse_destiny_output(stdout_logs[i], input_cfg=sim_input_cfgs[i])
     elif simulator == "cryomem":
       sim_output = nvmexplorer_src.input_defs.cryomem_interface.parse_cryomem_output(stdout_logs[i], input_cfg=sim_input_cfgs[i])
     else:
@@ -203,7 +207,7 @@ def run_sim(simulator, output_paths, log_dir, stdout_logs, stderr_logs, sim_path
     #else:
     #  sim_output = pickle.load(open(output_paths[i], 'rb')) 
     #  sim_outputs.append(sim_output)
-
+  
   return sim_outputs
 
 ## Initialize objects based on config file and run eval
@@ -361,10 +365,7 @@ if __name__ == '__main__':
                                                       workingset = working_set)
                                                   if hybrid:  
                                                       _first_cell_type = _cell_type.split("-")[0]
-                                                      print(_first_cell_type)
                                                       _second_cell_type = _cell_type.split("-")[-1]
-                                                      print(_second_cell_type)
-                                                      print(hybrid)
                                                   # Loads data from NVM database
                                                   if hybrid:
                                                       if _first_cell_type != "eDRAM":
@@ -421,6 +422,8 @@ if __name__ == '__main__':
                                                       cell_cfgs = [worst_case_cell_cfg, best_case_cell_cfg]
                                                       output_paths = [worst_output_path, best_output_path]
                                                       stdout_logs = [worst_case_stdout_log, best_case_stdout_log]
+                                                      print(worst_case_stdout_log)
+                                                      print(best_case_stdout_log)
                                                       stderr_logs = [worst_case_stderr_log, best_case_stderr_log]
                                                       cfg_paths = [worst_case_cfg_path, best_case_cfg_path]
                                                       sim_input_cfgs = [sim_worst_case_input_cfg, sim_best_case_input_cfg]
@@ -474,7 +477,7 @@ if __name__ == '__main__':
                                                             stderr_logs.append("{}/logs/{}_{}MB_{}b_{}banks_{}bankorg_{}matorg_{}_{}BPC_{}nm_{}stackeddies_{}monolithiclayers_{}_error".format(output_path, _cell_type, _capacity, _word_width, _banks, _bank_org, mat_org, _opt_target, _bits_per_cell, _process_node, _stacked_die_count, _monolithic_layer_count, this_custom_cell_input["name"]))
 
                                                   # Run modified nvsim or destiny on cell configs
-                                                  sim_outputs = run_sim_wrapper(simulator, output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, destiny_path, cryomem_path, cfg_paths, sim_input_cfgs, extra_cryomem_args, _temperature, output_dir)
+                                                  sim_outputs = run_sim_wrapper(simulator, design_target, output_paths, log_dir, stdout_logs, stderr_logs, nvsim_path, destiny_path, cryomem_path, cfg_paths, sim_input_cfgs, extra_cryomem_args, _temperature, output_dir)
                                                   
                                                   # Report results, add cell config params, mem config params, and whatever we are sweeping to the header
                                                   for i in range(len(sim_outputs)):

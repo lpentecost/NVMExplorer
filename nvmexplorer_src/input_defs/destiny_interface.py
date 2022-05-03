@@ -131,7 +131,11 @@ class DestinyInputConfig:
     #cfg_file.write("-ForceBank3D: ".format(self.force_bank_3d)+"\n") #Dimensions of each bank in terms of number of Mats in each direction.
     #cfg_file.write("-ForceBank3DA: ".format(self.force_bank_3da)+"\n") #Same as ForceBank3D, except forcing the number of active Mats is not required
     #cfg_file.write("-ForceBankA: ".format(self.force_bank_a)+"\n") #Same as ForceBank in NVSim, except forcing the number of active Mats is not required.
-    cfg_file.write("-PrintLevel: %d\n" % self.print_level+"\n") #0 -> does NOT produce CACHE DATA ARRAY DETAILS and CACHE TAG ARRAY DETAILS
+    if self.design_target == "cache":
+      cfg_file.write("-PrintLevel: 1\n") #0 -> does NOT produce CACHE DATA ARRAY DETAILS and CACHE TAG ARRAY DETAILS
+    else:
+      cfg_file.write("-PrintLevel: 0\n")
+    #cfg_file.write("-PrintLevel: %d\n" % self.print_level+"\n") 
     #1 -> produces CACHE DATA ARRAY DETAILS and CACHE TAG ARRAY DETAILS 
     if self.cell_type.mlc > 1:
       cell_levels = 2**(self.cell_type.mlc)
@@ -329,6 +333,23 @@ def parse_destiny_output_cache(filepath='output_examples/sram_0', input_cfg=Dest
   """
   #initialize base
   base = DestinyOutputConfig(input_cfg=input_cfg)
+  area = []
+  cache_hit_latency = []
+  cache_miss_latency = []
+  cache_write_latency = []
+  read_latency = []
+  area_efficiency = []
+  read_bw = [] 
+  write_bw = []
+  cache_miss_dynamic_energy = []
+  cache_write_dynamic_energy = []
+  cache_hit_dynamic_energy = []
+  read_energy = []
+  leakage_power = []
+  write_latency = []
+  write_energy = []
+  mem_cell = []
+
 
   with open(filepath, 'r') as f:
     lines = f.readlines()
@@ -344,7 +365,8 @@ def parse_destiny_output_cache(filepath='output_examples/sram_0', input_cfg=Dest
       area.append(float(line[line.index("=")+1:][:-4]))
       if line[-4:] == "um^2":
         area[-1] = area[-1] / (1000.)**2
-    elif ' -  Cache Hit Latency' in line:
+    elif ' - Cache Hit Latency' in line:
+      line = line.replace(" per access", "")
       cache_hit_latency.append(float(line[line.index("=")+1:][:-2]))
       if line[-2:] == "us": #scale to ns
         cache_hit_latency[-1] = cache_hit_latency[-1] * 1000.
@@ -352,7 +374,8 @@ def parse_destiny_output_cache(filepath='output_examples/sram_0', input_cfg=Dest
         cache_hit_latency[-1] = cache_hit_latency[-1] / 1000.
       if line[-2:] == "ms": #scale to ns (yikes!)
         cache_hit_latency[-1] = cache_hit_latency[-1] * 1000000.
-    elif ' -  Cache Miss Latency' in line:
+    elif ' - Cache Miss Latency' in line:
+      line = line.replace(" per access", "")
       cache_miss_latency.append(float(line[line.index("=")+1:][:-2]))
       if line[-2:] == "us": #scale to ns
         cache_miss_latency[-1] = cache_miss_latency[-1] * 1000.
@@ -360,7 +383,8 @@ def parse_destiny_output_cache(filepath='output_examples/sram_0', input_cfg=Dest
         cache_miss_latency[-1] = cache_miss_latency[-1] / 1000.
       if line[-2:] == "ms": #scale to ns (yikes!)
         cache_miss_latency[-1] = cache_miss_latency[-1] * 1000000.
-    elif ' -  Cache Write Latency' in line:
+    elif ' - Cache Write Latency' in line:
+      line = line.replace(" per access", "")
       cache_write_latency.append(float(line[line.index("=")+1:][:-2]))
       if line[-2:] == "us": #scale to ns
         cache_write_latency[-1] = cache_write_latency[-1] * 1000.
@@ -390,19 +414,22 @@ def parse_destiny_output_cache(filepath='output_examples/sram_0', input_cfg=Dest
         write_bw[-1] = write_bw[-1] / 1024.
       if line[-4:] == "KB/s": #scale to GB/s
         write_bw[-1] = write_bw[-1] / 1024. / 1024.
-    elif ' -  Cache Hit Dynamic Energy ' in line:
+    elif ' - Cache Hit Dynamic Energy ' in line:
+      line = line.replace(" per access", "")
       cache_hit_dynamic_energy.append(float(line[line.index("=")+1:][:-2]))
       if line[-2:] == "nJ": #scale to pJ
         cache_hit_dynamic_energy[-1] = cache_hit_dynamic_energy[-1] * 1000.
       if line[-2:] == "uJ": #scale to pJ
         cache_hit_dynamic_energy[-1] = cache_hit_dynamic_energy[-1] * 1000. * 1000.
-    elif ' -  Cache Miss Dynamic Energy ' in line:
+    elif ' - Cache Miss Dynamic Energy ' in line:
+      line = line.replace(" per access", "")
       cache_miss_dynamic_energy.append(float(line[line.index("=")+1:][:-2]))
       if line[-2:] == "nJ": #scale to pJ
         cache_miss_dynamic_energy[-1] = cache_miss_dynamic_energy[-1] * 1000.
       if line[-2:] == "uJ": #scale to pJ
         cache_miss_dynamic_energy[-1] = cache_miss_dynamic_energy[-1] * 1000. * 1000.
-    elif ' -  Cache Write Dynamic Energy ' in line:
+    elif ' - Cache Write Dynamic Energy ' in line:
+      line = line.replace(" per access", "")
       cache_write_dynamic_energy.append(float(line[line.index("=")+1:][:-2]))
       if line[-2:] == "nJ": #scale to pJ
         cache_write_dynamic_energy[-1] = cache_write_dynamic_energy[-1] * 1000.
