@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 
 # define different NVM fault models
 nvm_model = 'rram_mlc'
@@ -17,3 +18,4 @@ if torch.cuda.is_available():
     print("CUDA is available")
 else:
   pt_device = "cpu"
+

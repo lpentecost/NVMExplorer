@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import random
-import scipy.stats as ss
+from statistics import NormalDist
 import pickle
 import sys
 import os
@@ -63,7 +63,10 @@ def fault_rate_gen(dist_args):
   :param dist_args: arguments describing the distribution of level-to-level faults (programmed level means and sdevs)
   """
   if 'rram' in nvm_model:
-    cdf = ss.norm.cdf(*dist_args)
+    x = dist_args[0]
+    mu = dist_args[1]
+    sigma = dist_args[2]
+    cdf = NormalDist(mu, sigma).cdf(x) 
   else:
     raise SystemExit("ERROR: model not defined; please update fi_config.py")
 
