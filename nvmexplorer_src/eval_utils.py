@@ -47,10 +47,10 @@ class ExperimentResult:
       self.access_pattern.read_freq = (self.access_pattern.total_reads / self.access_pattern.total_ins) / 1.e8 #FIXME yikes I'm having to assume an IPC to approximate this?
       self.access_pattern.write_freq = (self.access_pattern.total_writes / self.access_pattern.total_ins) / 1.e8 #FIXME yikes I'm having to assume an IPC to approximate this?
     self.read_per_s = np.ceil((8 * self.access_pattern.read_size * self.access_pattern.read_freq) / self.input_cfg.word_width)
-    self.total_dynamic_read_power = self.read_per_s * self.output.read_energy / 1000. / 1000. #scale to mW
+    self.total_dynamic_read_power = self.read_per_s * self.output.read_energy / 1000. / 1000. / 1000. #scale to mW  FIXME: CL added
       #calculate total # writes / s
     self.write_per_s = np.ceil((8 * self.access_pattern.write_size * self.access_pattern.write_freq) / self.input_cfg.word_width)
-    self.total_dynamic_write_power = self.write_per_s * self.output.write_energy / 1000. / 1000. #scale to mW
+    self.total_dynamic_write_power = self.write_per_s * self.output.write_energy / 1000. / 1000. /1000. #scale to mW  FIXME: CL added
 
     #total power = leakage + reads + writes
     #FIXME add any refresh overhead
@@ -65,9 +65,9 @@ class ExperimentResult:
       self.total_write_latency = self.write_per_s * self.output.write_latency / 1000. / 1000. #scale to ms
     else:
       total_read_access = np.ceil((8 * self.access_pattern.total_reads * self.access_pattern.read_size) / self.input_cfg.word_width) 
-      self.total_read_energy = total_read_access * self.output.read_energy #/ 1000. / 1000. #scale to mJ 
+      self.total_read_energy = total_read_access * self.output.read_energy / 1000. / 1000. / 1000. #scale to mJ   FIXME: CL added
       total_write_access = np.ceil((8 * self.access_pattern.total_writes * self.access_pattern.write_size) / self.input_cfg.word_width) 
-      self.total_write_energy = total_write_access * self.output.write_energy / 1000. / 1000. #scale to mJ 
+      self.total_write_energy = total_write_access * self.output.write_energy / 1000. / 1000. /1000. #scale to mJ   FIXME: CL added
       self.total_read_latency = total_read_access * self.output.read_latency / 1000. / 1000. #scale to ms 
       self.total_write_latency = total_write_access * self.output.write_latency / 1000. / 1000. #scale to ms
 
