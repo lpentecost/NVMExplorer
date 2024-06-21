@@ -1,0 +1,8 @@
+Memory Cell,min,max,Details
+memristor,1.00E+04,1.00E+09,
+PCRAM,1.00E+05,2.00E+11,
+MRAM,1.00E+06,1.00E+15,
+SOT,,1.00E+11,
+FeFET,1.00E+04,1.00E+11,
+CTT,,,
+eFlash,1.00E+06,,(Cypress Data Sheet)
